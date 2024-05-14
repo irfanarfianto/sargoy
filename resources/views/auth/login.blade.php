@@ -45,7 +45,7 @@
             </x-primary-button>
         </div>
         <div class="flex items-center justify-center mt-4">
-            <a href="{{ route('oauth.google') }}"
+            <a href="{{ route('login.google') }}"
                 class="items-center px-5 py-2 bg-white shadow-md border border-transparent rounded-md font-semibold text-xs text-grey text-center uppercase tracking-widest hover:bg-gray-100 focus:bg-gray-700 active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 ms-4"><i
                     class="fa-brands fa-google"></i>
                 <strong>Login with Google</strong>

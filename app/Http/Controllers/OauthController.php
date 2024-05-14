@@ -32,7 +32,7 @@ class OauthController extends Controller
                     'email' => $user->email,
                     'gauth_id' => $user->id,
                     'gauth_type' => 'google',
-                    'password' => encrypt('admin@123')
+                    // 'password' => encrypt('')
                 ]);
 
                 Auth::login($newUser);
