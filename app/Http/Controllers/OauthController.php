@@ -35,6 +35,8 @@ class OauthController extends Controller
                     // 'password' => encrypt('')
                 ]);
 
+                $newUser->givePermissionTo('view catalog');
+
                 Auth::login($newUser);
 
                 return redirect('/dashboard');

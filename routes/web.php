@@ -20,4 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/admin', function () {
+    return '<h1>ADMIN</h1>';
+})->middleware(['auth', 'verified', 'role:admin']);
+
+Route::get('/seller', function () {
+    return '<h1>Penjual</h1>';
+})->middleware(['auth', 'verified', 'role:seller|admin']);
+
 require __DIR__ . '/auth.php';
