@@ -18,17 +18,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
-        @include('layouts.navigation')
+<body class="font-sans text-gray-900 antialiased">
 
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
+    {{ $slot }}
 
-        @include('layouts.footer')
-    </div>
 </body>
 
 </html>
