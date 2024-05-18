@@ -14,7 +14,6 @@
                     <x-nav-link href="{{ route('login') }}" class="font-bold">
                         {{ __('Masuk / Daftar') }}
                     </x-nav-link>
-
                 @endauth
             @endif
         </div>
@@ -30,27 +29,17 @@
                     </x-nav-link>
                 </li>
                 <li>
-                    <x-nav-link :href="url('/produk')" :active="request()->is('/produk')">
+                    <x-nav-link :href="url('/produk')" :active="request()->is('produk*')">
                         {{ __('Produk') }}
                     </x-nav-link>
                 </li>
                 <li>
-                    <x-nav-link :href="url('/edukasi')" :active="request()->is('/edukasi')">
+                    <x-nav-link :href="url('/edukasi')" :active="request()->is('edukasi*')">
                         {{ __('Edukasi') }}
                     </x-nav-link>
                 </li>
                 <li>
-                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('/tentang-kami')">
-                        {{ __('Tentang Kami') }}
-                    </x-nav-link>
-                </li>
-                <li>
-                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('/tentang-kami')">
-                        {{ __('Tentang Kami') }}
-                    </x-nav-link>
-                </li>
-                <li>
-                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('/tentang-kami')">
+                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('tentang-kami*')">
                         {{ __('Tentang Kami') }}
                     </x-nav-link>
                 </li>
