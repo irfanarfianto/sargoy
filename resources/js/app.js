@@ -1,6 +1,10 @@
 import "./bootstrap";
 import "flowbite";
-import Swiper from "swiper";
+import Swiper from "swiper/bundle";
+
+// import styles bundle
+import "swiper/css/bundle";
+
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -14,13 +18,16 @@ Alpine.start();
 
 const swiper = new Swiper(".swiper", {
     modules: [Navigation, Pagination],
-    // Optional parameters
     direction: "horizontal",
     loop: true,
+    autoplay: {
+        delay: 2500,
+        disableOnInteraction: false,
+    },
 
-    // If we need pagination
     pagination: {
         el: ".swiper-pagination",
+        clickable: true,
     },
 
     // Navigation arrows
@@ -29,8 +36,4 @@ const swiper = new Swiper(".swiper", {
         prevEl: ".swiper-button-prev",
     },
 
-    // And if we need scrollbar
-    scrollbar: {
-        el: ".swiper-scrollbar",
-    },
 });

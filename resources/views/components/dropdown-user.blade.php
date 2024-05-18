@@ -14,22 +14,38 @@
 <div id="dropdownNavbar"
     class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
     <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
-        <li>
-            <a href="{{ route('profile.edit') }}"
-                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                {{ __('Profile') }}
-            </a>
-        </li>
+        @if (auth()->user()->hasRole('visitor'))
+            <li>
+                <a href="{{ route('profile.edit') }}"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                    {{ __('Profile') }}
+                </a>
+            </li>
+        @endif
+        @if (auth()->user()->hasRole('admin'))
+            <li>
+                <a href="{{ route('admin.dashboard') }}"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                    {{ __('Admin Dashboard') }}
+                </a>
+            </li>
+        @elseif(auth()->user()->hasRole('seller'))
+            <li>
+                <a href="{{ route('seller.dashboard') }}"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                    {{ __('Seller Dashboard') }}
+                </a>
+            </li>
+        @endif
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <li>
                 <a href="{{ route('logout') }}"
                     onclick="event.preventDefault();
-                                                      this.closest('form').submit();"
+                    this.closest('form').submit();"
                     class="block px-4 py-2 hover:bg-gray-100 hover:text-red-600 dark:hover:bg-gray-600 dark:hover:text-white">
                     {{ __('Keluar') }}
                 </a>
-
             </li>
         </form>
     </ul>
