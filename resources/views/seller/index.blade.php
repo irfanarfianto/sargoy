@@ -1,4 +1,4 @@
-<x-dashboard-layout>
+<x-dashboard-layout title="Seller">
     <h2 class="font-semibold mt-14 text-xl text-gray-800 leading-tight">
         {{ __('Dashboard') }}
     </h2>
