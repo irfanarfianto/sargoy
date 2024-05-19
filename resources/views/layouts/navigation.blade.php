@@ -4,12 +4,12 @@
             <x-logo.application class="block h-9 w-auto fill-current text-gray-800" />
         </a>
         <div class="flex-grow">
-            <x-search-input action="" method="GET"></x-search-input>
+            <x-input.search-input action="" method="GET"></x-input.search-input>
         </div>
         <div class="flex items-center space-x-2">
             @if (Route::has('login'))
                 @auth
-                    <x-dropdown-user />
+                    <x-dropdown.dropdown-user />
                 @else
                     <x-navbar.link href="{{ route('login') }}" class="font-bold">
                         {{ __('Masuk / Daftar') }}
