@@ -33,8 +33,17 @@ Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
     Route::delete('/seller/edit', [Controllers\SellerController::class, 'destroy'])->name('seller.destroy');
 });
 
-Route::get('/produk', [Controllers\ProductController::class,'index']);
-Route::get('/edukasi', [Controllers\EdukasiController::class,'index']);
-Route::get('/tentang-kami', [Controllers\TentangKamiController::class,'index']);
+Route::get('/produk', [Controllers\ProductController::class, 'index']);
+Route::get('/edukasi', [Controllers\EdukasiController::class, 'index']);
+Route::get('/tentang-kami', [Controllers\TentangKamiController::class, 'index']);
+
+
+// Route::middleware(['auth', 'verified', 'role:admin'])->group(
+//     function () {
+//         Route::resource('faqs', Controllers\FAQController::class);
+//     }
+// );
+
+Route::resource('faqs', Controllers\FAQController::class);
 
 require __DIR__ . '/auth.php';
