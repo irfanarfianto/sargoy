@@ -43,16 +43,6 @@
                         {{ __('Tentang Kami') }}
                     </x-navbar.link>
                 </li>
-                <li>
-                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('/tentang-kami')">
-                        {{ __('Tentang Kami') }}
-                    </x-nav-link>
-                </li>
-                <li>
-                    <x-nav-link :href="url('/tentang-kami')" :active="request()->is('/tentang-kami')">
-                        {{ __('Tentang Kami') }}
-                    </x-nav-link>
-                </li>
             </ul>
         </div>
     </div>
