@@ -20,12 +20,10 @@ class FAQController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'pertanyaan' => 'required|unique:faqs',
-            'jawaban' => 'required',
-        ]);
-
-        FAQ::create($request->all());
+        FAQ::create($request->validate([
+            'pertanyaan' => 'required|min:10|string|unique:faqs',
+            'jawaban' => 'required|min:10|string',
+        ]));
 
         return redirect()->route('faqs.index')->with('success', 'FAQ created successfully.');
     }
@@ -42,12 +40,10 @@ class FAQController extends Controller
 
     public function update(Request $request, FAQ $faq)
     {
-        $request->validate([
-            'pertanyaan' => 'required',
-            'jawaban' => 'required',
-        ]);
-
-        $faq->update($request->all());
+        $faq->update($request->validate([
+            'pertanyaan' => 'required|min:10|string|unique:faqs',
+            'jawaban' => 'required|min:10|string',
+        ]));
 
         return redirect()->route('faqs.index')->with('success', 'FAQ updated successfully.');
     }

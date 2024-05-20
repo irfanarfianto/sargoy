@@ -37,6 +37,9 @@
                     <input
                         class="shadow appearance-none border rounded w-full py-2 px-3 border-gray-300 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="pertanyaan" type="text" placeholder="Masukkan pertanyaan" name="pertanyaan">
+                    @error('pertanyaan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="mb-4">
                     <x-label.input class="block text-gray-700 text-sm font-bold mb-2" for="jawaban">
@@ -45,6 +48,9 @@
                     <textarea
                         class="block p-2.5 w-full h-36 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="jawaban" placeholder="Masukkan jawaban" name="jawaban"></textarea>
+                    @error('jawaban')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="flex items-center justify-between">
                     <button
@@ -93,6 +99,9 @@
                             class="shadow appearance-none border rounded w-full py-2 px-3 border-gray-300 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="pertanyaan" type="text" placeholder="Masukkan pertanyaan" name="pertanyaan"
                             value="{{ $faq->pertanyaan }}">
+                        @error('pertanyaan')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4">
                         <x-label.input class="block text-gray-700 text-sm font-bold mb-2" for="jawaban">
@@ -101,6 +110,9 @@
                         <textarea
                             class="block p-2.5 w-full h-36 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             id="jawaban" placeholder="Masukkan jawaban" name="jawaban">{{ $faq->jawaban }}</textarea>
+                        @error('jawaban')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="flex items-center justify-between">
                         <x-button.primary
