@@ -3,7 +3,7 @@
         <div class="md:flex md:justify-between">
             <div class="mb-6 md:mb-0">
                 <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-                    <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <x-logo.application class="block h-9 w-auto fill-current text-gray-800" />
                 </a>
             </div>
             <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
