@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', Controllers\HomeController::class);
 
@@ -33,7 +34,14 @@ Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
     Route::delete('/seller/edit', [Controllers\SellerController::class, 'destroy'])->name('seller.destroy');
 });
 
-Route::get('/produk', [Controllers\ProductController::class, 'index']);
+Route::get('/produk', [ProductController::class, 'index'])->name('product.index');
+Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
+Route::post('/produk', [ProductController::class, 'store'])->name('product.store');
+Route::get('/produk/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/produk/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
+Route::put('/produk/{id}', [ProductController::class, 'update'])->name('product.update');
+Route::delete('/produk/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+
 Route::get('/edukasi', [Controllers\EdukasiController::class, 'index']);
 Route::get('/tentang-kami', [Controllers\TentangKamiController::class, 'index']);
 

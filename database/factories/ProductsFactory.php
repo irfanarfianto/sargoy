@@ -17,10 +17,10 @@ class ProductsFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->word,
-            'images' => "https://source.unsplash.com/2500x1000/?product,fashion",
-            'description' => $this->faker->sentence,
-            'price' => $this->faker->randomFloat(3, 1000, 100000),
+            'product_name' => $this->faker->sentence(3),
+            'images' => $this->faker->imageUrl(360, 360, 'clothes', true),
+            'description' => $this->faker->paragraph(10),
+            'price' => $this->faker->numberBetween(10000, 100000),
         ];
     }
 }
