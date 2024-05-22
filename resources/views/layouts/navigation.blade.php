@@ -34,8 +34,8 @@
                     </x-navbar.link>
                 </li>
                 <li>
-                    <x-navbar.link href="/edukasi">
-                        {{ __('Edukasi') }}
+                    <x-navbar.link href="/blogs">
+                        {{ __('Blogs') }}
                     </x-navbar.link>
                 </li>
                 <li>
