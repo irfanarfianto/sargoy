@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
 });
 
 Route::get('/produk', [Controllers\ProductController::class, 'index']);
-Route::get('/edukasi', [Controllers\EdukasiController::class, 'index']);
+Route::get('/blogs', [Controllers\BlogController::class, 'index']);
 Route::get('/tentang-kami', [Controllers\TentangKamiController::class, 'index']);
 
 
