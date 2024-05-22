@@ -4,7 +4,7 @@
             {{ __('Produk') }}
             @foreach($products as $product)
             <x-card.product image="{{ $product->images }}"
-                title="{{ $product->name }}"
+                title="{{ $product->product_name }}"
                 price="Rp: {{ $product->price }}"
                 link="/produk/{{ $product->id }}" />
             @endforeach
