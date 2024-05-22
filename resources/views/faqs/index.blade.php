@@ -9,8 +9,8 @@
             <x-error.alert type="success" :message="session('success')" />
         @endif
 
-        @if ($errors->any())
-            <x-error.alert type="error" :message="$errors->first()" />
+        @if (session('error'))
+            <x-error.alert type="danger" :message="session('error')" />
         @endif
 
         {{-- modal --}}

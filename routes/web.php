@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
     Route::delete('/seller/edit', [Controllers\SellerController::class, 'destroy'])->name('seller.destroy');
 });
 
+
 Route::get('/produk', [ProductController::class, 'index'])->name('product.index');
 Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
 Route::post('/produk', [ProductController::class, 'store'])->name('product.store');
@@ -42,7 +43,8 @@ Route::get('/produk/{id}/edit', [ProductController::class, 'edit'])->name('produ
 Route::put('/produk/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/produk/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
-Route::get('/edukasi', [Controllers\EdukasiController::class, 'index']);
+Route::get('/blogs', [Controllers\BlogController::class, 'index']);
+
 Route::get('/tentang-kami', [Controllers\TentangKamiController::class, 'index']);
 
 
