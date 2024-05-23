@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 
 Route::get('/', Controllers\HomeController::class);
@@ -42,6 +43,10 @@ Route::get('/produk/{id}', [ProductController::class, 'show'])->name('product.sh
 Route::get('/produk/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
 Route::put('/produk/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/produk/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 
 Route::get('/blogs', [Controllers\BlogController::class, 'index']);
 
