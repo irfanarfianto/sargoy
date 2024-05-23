@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Products;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Products::all();
+        $products = Product::paginate(10);
         return view('product.index', compact('products'));
     }
 
@@ -36,7 +36,7 @@ class ProductController extends Controller
             'description' => 'required',
             'price' => 'required|numeric',
         ]);
-    
+
         // Handle file upload
         if ($request->hasFile('images')) {
             $image = $request->file('images');
@@ -45,7 +45,7 @@ class ProductController extends Controller
             $validatedData['images'] = 'images/' . $imageName;
         }
 
-        Products::create($validatedData);
+        Product::create($validatedData);
 
         return redirect()->route('product.index');
     }
@@ -55,7 +55,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Products::findOrFail($id);
+        $product = Product::findOrFail($id);
         dd($product->product_name);
         // return view('product.show', compact('product'));
     }
@@ -65,7 +65,7 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = Products::findOrFail($id);
+        $product = Product::findOrFail($id);
         return view('product.edit', compact('product'));
     }
 
@@ -82,7 +82,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        $product = Products::findOrFail($id);
+        $product = Product::findOrFail($id);
 
         if ($request->hasFile('images')) {
             if ($product->images && file_exists(public_path($product->images))) {
@@ -107,7 +107,7 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Products::findOrFail($id);
+        $product = Product::findOrFail($id);
 
         if ($product->images && file_exists(public_path($product->images))) {
             unlink(public_path($product->images));
