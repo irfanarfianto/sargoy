@@ -22,33 +22,34 @@
     </div>
 
     <div class="flex mt-3.5">
-        <form id="product-form" action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data"
-            class="flex flex-wrap gap-2.5 w-full max-w-screen-xl">
+        <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            {{-- tampilan kiri --}}
-            <div class="flex flex-col w-full lg:w-2/3">
-                <div class="mb-4">
-                    <x-label.input for="product_name" :value="__('Nama Produk')" />
-                    <x-input.text type="text" id="product_name" name="product_name" value="{{ old('product_name') }}"
-                        required autofocus />
-                    <x-error.input-error :messages="$errors->get('product_name')" class="mt-2" />
-                </div>
-
-                <div class="mb-4">
-                    <x-label.input for="description" :value="__('Deskripsi Produk')" />
-                    <x-input.text type="text" id="description" name="description" value="{{ old('description') }}"
-                        required />
-                    <x-error.input-error :messages="$errors->get('description')" class="mt-2" />
-                </div>
+            <div>
+                <label for="product_name">Product Name:</label>
+                <input type="text" id="product_name" name="product_name" value="{{ old('product_name') }}">
             </div>
-
-            {{-- tampilan kanan --}}
-            <div class="flex flex-col w-full lg:w-1/4">
-                <div class="mb-4">
-                    <x-label.input for="price" :value="__('Harga Produk')" />
-                    <x-input.text type="text" id="price" name="price" value="{{ old('price') }}" required />
-                    <x-error.input-error :messages="$errors->get('price')" class="mt-2" />
-                </div>
+            <div>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description">{{ old('description') }}</textarea>
+            </div>
+            <div>
+                <label for="price">Price:</label>
+                <input type="text" id="price" name="price" value="{{ old('price') }}">
+            </div>
+            <div>
+                <label for="images">Images:</label>
+                <input type="file" id="images" name="images[]" multiple accept="image/*">
+            </div>
+            <div>
+                <label for="categories">Categories:</label>
+                <select id="categories" name="categories[]" multiple>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <button type="submit">Create Product</button>
             </div>
         </form>
     </div>
