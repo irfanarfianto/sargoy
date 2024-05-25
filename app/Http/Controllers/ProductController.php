@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -42,8 +43,33 @@ class ProductController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
-        $product = Product::create($request->only(['product_name', 'description', 'price']));
+        // Function to generate unique slug
+        function generateUniqueSlug($productName)
+        {
+            $slug = Str::slug($productName);
+            $originalSlug = $slug;
+            $count = 1;
 
+            while (Product::where('slug', $slug)->exists()) {
+                $slug = $originalSlug . '-' . $count;
+                $count++;
+            }
+
+            return $slug;
+        }
+
+        // Generate unique slug from product_name
+        $slug = generateUniqueSlug($request->input('product_name'));
+
+        // Create product with unique slug
+        $product = Product::create([
+            'product_name' => $request->input('product_name'),
+            'description' => $request->input('description'),
+            'price' => $request->input('price'),
+            'slug' => $slug
+        ]);
+
+        // Save product images if present
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $imagePath = $image->store('product_images');
@@ -54,6 +80,7 @@ class ProductController extends Controller
             }
         }
 
+        // Attach categories to the product
         $product->categories()->attach($request->input('categories'));
 
         return redirect()->route('product.index')->with('success', 'Product created successfully.');
@@ -62,9 +89,9 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
         dd($product->product_name);
         // return view('product.show', compact('product'));
     }
@@ -72,19 +99,19 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $slug)
     {
         $categories = Category::all();
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
         return view('product.edit', compact('product', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product, $id)
+    public function update(Request $request, $slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
         $request->validate([
             'product_name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -93,12 +120,12 @@ class ProductController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'exists:categories,id',
         ]);
-    
+
         $product->update($request->only(['product_name', 'description', 'price']));
-    
+
         if ($request->hasFile('images')) {
             $product->images()->delete();
-    
+
             foreach ($request->file('images') as $image) {
                 $imagePath = $image->store('product_images');
                 ProductImage::create([
@@ -112,16 +139,16 @@ class ProductController extends Controller
         foreach ($request->input('categories') as $categoryId) {
             $product->categories()->attach($categoryId, ['product_id' => $product->id]);
         }
-    
+
         return redirect()->route('product.index')->with('success', 'Product updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($slug);
     
         $product->images()->delete();
     

@@ -96,7 +96,7 @@ button:hover {
 <body>
     <div class="container">
         <h1>Update Product</h1>
-        <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('product.update', $product->slug) }}" method="POST" enctype="multipart/form-data">
             @csrf
         @method('PUT')
         <div>
