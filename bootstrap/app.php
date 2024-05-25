@@ -20,8 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->validateCsrfTokens(except: [
-            // '/categories',
-            // '/produk' // <-- exclude this route
+            // '/produk/sarung-goyor',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

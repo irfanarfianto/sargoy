@@ -43,23 +43,7 @@ class ProductController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
-        // Function to generate unique slug
-        function generateUniqueSlug($productName)
-        {
-            $slug = Str::slug($productName);
-            $originalSlug = $slug;
-            $count = 1;
-
-            while (Product::where('slug', $slug)->exists()) {
-                $slug = $originalSlug . '-' . $count;
-                $count++;
-            }
-
-            return $slug;
-        }
-
-        // Generate unique slug from product_name
-        $slug = generateUniqueSlug($request->input('product_name'));
+        $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
 
         // Create product with unique slug
         $product = Product::create([
@@ -92,8 +76,8 @@ class ProductController extends Controller
     public function show(string $slug)
     {
         $product = Product::where('slug', $slug)->firstOrFail();
-        dd($product->product_name);
-        // return view('product.show', compact('product'));
+        return view('product.show', compact('product'));
+        // return response()->json($product, 200);
     }
 
     /**
@@ -104,6 +88,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $product = Product::where('slug', $slug)->firstOrFail();
         return view('product.edit', compact('product', 'categories'));
+        // return response()->json($product, 200);
     }
 
     /**
@@ -148,14 +133,12 @@ class ProductController extends Controller
      */
     public function destroy(string $slug)
     {
-        $product = Product::findOrFail($slug);
-    
+
+        $product = Product::where('slug', $slug)->firstOrFail();
         $product->images()->delete();
-    
         $product->categories()->detach();
-    
         $product->delete();
-    
         return redirect()->route('product.index')->with('success', 'Product Delete successfully.');
+        // return response()->json($product, 200);
     }
 }
