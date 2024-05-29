@@ -39,10 +39,10 @@ Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
 Route::get('/produk', [ProductController::class, 'index'])->name('product.index');
 Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
 Route::post('/produk', [ProductController::class, 'store'])->name('product.store');
-Route::get('/produk/{id}', [ProductController::class, 'show'])->name('product.show');
-Route::get('/produk/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
-Route::put('/produk/{id}', [ProductController::class, 'update'])->name('product.update');
-Route::delete('/produk/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/produk/{slug}/edit', [ProductController::class, 'edit'])->name('product.edit');
+Route::put('/produk/{slug}', [ProductController::class, 'update'])->name('product.update');
+Route::delete('/produk/{slug}', [ProductController::class, 'destroy'])->name('product.destroy');
 
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
