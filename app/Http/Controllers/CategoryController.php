@@ -16,7 +16,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return view('categories.index', compact('categories'));
+        return view('dashboard.categories.index', compact('categories'));
     }
 
     public function create()
@@ -41,6 +41,6 @@ class CategoryController extends Controller
         \App\Models\Category::create($validatedData);
 
         // Redirect dengan pesan sukses
-        return redirect()->route('categories.create')->with('success', 'Kategori berhasil ditambahkan!');
+        return redirect()->route('dashboard.categories.create')->with('success', 'Kategori berhasil ditambahkan!');
     }
 }

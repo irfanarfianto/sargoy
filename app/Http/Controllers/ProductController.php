@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -12,16 +13,21 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::paginate(10);
-        return view('product.index', compact('products'));
-    }
+        $user = Auth::user();
+        $hasAdminRole = $user ? $user->hasRole('admin') : false;
+        $hasSellerRole = $user ? $user->hasRole('seller') : false;
+        $paginateCount = $hasAdminRole || $hasSellerRole ? 10 : 12;
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('product.create');
+        if ($hasAdminRole || $hasSellerRole) {
+            $products = Product::paginate($paginateCount);
+            $products->getCollection()->transform(function ($product) {
+                $product->price = number_format($product->price, 0, ',', '.');
+                return $product;
+            });
+            return view('dashboard.product.index', compact('products'));
+        } else {
+            return redirect()->route('product.index');
+        }
     }
 
     /**
@@ -29,7 +35,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate form data
         $validatedData = $request->validate([
             'product_name' => 'required',
             'images' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -37,36 +42,15 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        // Handle file upload
-        if ($request->hasFile('images')) {
-            $image = $request->file('images');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $validatedData['images'] = 'images/' . $imageName;
-        }
+        $imageName = time() . '.' . $validatedData['images']->getClientOriginalExtension();
+        $validatedData['images']->move(public_path('images'), $imageName);
+        $validatedData['images'] = 'images/' . $imageName;
+
+        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
 
         Product::create($validatedData);
 
-        return redirect()->route('product.index');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $product = Product::findOrFail($id);
-        dd($product->product_name);
-        // return view('product.show', compact('product'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $product = Product::findOrFail($id);
-        return view('product.edit', compact('product'));
+        return redirect()->route('dashboard.product.index');
     }
 
     /**
@@ -74,7 +58,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Validasi input
         $validatedData = $request->validate([
             'product_name' => 'required',
             'images' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -89,32 +72,16 @@ class ProductController extends Controller
                 unlink(public_path($product->images));
             }
 
-            $image = $request->file('images');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
+            $imageName = time() . '.' . $validatedData['images']->getClientOriginalExtension();
+            $validatedData['images']->move(public_path('images'), $imageName);
             $validatedData['images'] = 'images/' . $imageName;
-        } else {
-            $validatedData['images'] = $product->images;
         }
+
+        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
 
         $product->update($validatedData);
 
-        return redirect()->route('product.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $product = Product::findOrFail($id);
-
-        if ($product->images && file_exists(public_path($product->images))) {
-            unlink(public_path($product->images));
-        }
-
-        $product->delete();
-
-        return redirect()->route('product.index');
+        return redirect()->route('dashboard.product.index');
     }
 }
+

@@ -12,9 +12,13 @@ class HomeController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $products = Product::all();
+        $products = cache()->remember('home_page_products', 60, function () {
+            return Product::latest()->get();
+        });
+
         return view(
-            'home', compact('products')
+            'home',
+            compact('products')
         );
     }
 }
