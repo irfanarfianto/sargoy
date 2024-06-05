@@ -9,6 +9,8 @@ class Category extends Model
 {
     protected $fillable = [
         'category_name',
+        'images', 'position',
+        'meta_keyword',
     ];
 
     public function products()

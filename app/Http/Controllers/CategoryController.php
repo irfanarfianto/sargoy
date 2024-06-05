@@ -4,19 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Mockery\Exception;
 
 class CategoryController extends Controller
 {
-    /**
-     * Menampilkan form untuk membuat kategori baru.
-     *
-     * @return \Illuminate\View\View
-     */
-
     public function index()
     {
         $categories = Category::all();
-        return view('dashboard.categories.index', compact('categories'));
+        return view('categories.index', compact('categories'));
     }
 
     public function create()
@@ -24,12 +20,6 @@ class CategoryController extends Controller
         return view('categories.create');
     }
 
-    /**
-     * Menyimpan kategori baru ke database.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function store(Request $request)
     {
         // Validasi data
@@ -41,6 +31,6 @@ class CategoryController extends Controller
         \App\Models\Category::create($validatedData);
 
         // Redirect dengan pesan sukses
-        return redirect()->route('dashboard.categories.create')->with('success', 'Kategori berhasil ditambahkan!');
+        return redirect()->route('categories.create')->with('success', 'Kategori berhasil ditambahkan!');
     }
 }

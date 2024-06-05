@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Str;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -25,33 +26,11 @@ class ProductController extends Controller
     }
 
     /**
-     * Display a listing of the resource for the public.
+     * Show the form for creating a new resource.
      */
-    public function publicIndex()
+    public function create()
     {
-        $products = Product::paginate(9);
-        $products->getCollection()->transform(function ($product) {
-            $product->price = number_format($product->price, 0, ',', '.');
-            return $product;
-        });
-
-        $categories = Category::all();
-
-        return view('product.index', compact('products', 'categories'));
-    }
-
-    public function show($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->price = number_format($product->price, 0, ',', '.');
-
-        $breadcrumbItems = [
-            ['name' => 'Beranda', 'url' => '/'],
-            ['name' => 'Produk', 'url' => route('public.product.index')],
-            ['name' => $product->product_name],
-        ];
-
-        return view('product.show', compact('product', 'breadcrumbItems'));
+        return view('product.create');
     }
 
     /**
@@ -59,6 +38,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate form data
         $validatedData = $request->validate([
             'product_name' => 'required',
             'images' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -66,55 +46,87 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        $imageName = time() . '.' . $validatedData['images']->getClientOriginalExtension();
-        $validatedData['images']->move(public_path('images'), $imageName);
-        $validatedData['images'] = 'images/' . $imageName;
-
-        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+        // Handle file upload
+        if ($request->hasFile('images')) {
+            $image = $request->file('images');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $validatedData['images'] = 'images/' . $imageName;
+        }
 
         Product::create($validatedData);
 
-        return redirect()->route('dashboard.product.index');
+        return redirect()->route('product.index');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $product = Product::findOrFail($id);
+        dd($product->product_name);
+        // return view('product.show', compact('product'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $product = Product::findOrFail($id);
+        return view('product.edit', compact('product'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $slug)
     {
+        // Validasi input
         $validatedData = $request->validate([
             'product_name' => 'required',
             'images' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'description' => 'required',
             'price' => 'required|numeric',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
-        $product = Product::findOrFail($id);
+        $product->update($request->only(['product_name', 'description', 'price']));
 
         if ($request->hasFile('images')) {
             if ($product->images && file_exists(public_path($product->images))) {
                 unlink(public_path($product->images));
             }
 
-            $imageName = time() . '.' . $validatedData['images']->getClientOriginalExtension();
-            $validatedData['images']->move(public_path('images'), $imageName);
+            $image = $request->file('images');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
             $validatedData['images'] = 'images/' . $imageName;
+        } else {
+            $validatedData['images'] = $product->images;
         }
-
-        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
 
         $product->update($validatedData);
 
-        return redirect()->route('dashboard.product.index');
+        return redirect()->route('product.index');
     }
 
-    public function loadMoreProducts(Request $request)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
     {
-        $offset = $request->input('offset');
-        $limit = 6;
+        $product = Product::findOrFail($id);
 
-        $products = Product::skip($offset)->take($limit)->get();
+        if ($product->images && file_exists(public_path($product->images))) {
+            unlink(public_path($product->images));
+        }
 
-        return response()->json($products);
+        $product->delete();
+
+        return redirect()->route('product.index');
     }
 }

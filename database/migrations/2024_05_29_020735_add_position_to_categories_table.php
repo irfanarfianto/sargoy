@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('images');
+        Schema::table('categories', function (Blueprint $table) {
+            $table->integer('position')->default(0)->after('category_name');
+            $table->string('meta_keyword')->nullable()->after('position');
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('images')->nullable();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn('position');
+            $table->dropColumn('meta_keyword');
         });
     }
 };

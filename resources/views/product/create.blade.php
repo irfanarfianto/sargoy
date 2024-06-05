@@ -1,6 +1,6 @@
 <x-dashboard-layout>
     <div class="items-center mt-14">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between flex-wrap w-full max-w-screen-xl">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Tambah Produk Baru') }}
             </h2>
@@ -11,19 +11,16 @@
                         Kembali
                     </x-button.secondary>
                 </a>
-                <button form="product-form" type="submit"
-                    class="ms-2 flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-400 dark:hover:bg-gray-700">
-                    <x-button.primary>
-                        Simpan
-                    </x-button.primary>
-                </button>
+
+                <x-button.primary form="product-form" type="submit">
+                    Simpan
+                </x-button.primary>
             </div>
         </div>
     </div>
 
     <div class="flex mt-3.5">
-        <form id="product-form" action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data"
-            class="flex flex-wrap gap-2.5 w-full max-w-screen-xl">
+        <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             {{-- tampilan kiri --}}
             <div class="flex flex-col w-full lg:w-2/3">
@@ -52,4 +49,39 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function formatRupiah(element) {
+            let value = element.value;
+            value = value.replace(/[^,\d]/g, "").toString();
+            let split = value.split(",");
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? "." : "";
+                rupiah += separator + ribuan.join(".");
+            }
+
+            rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+            element.value = rupiah ? "Rp. " + rupiah : "";
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const statusCheckbox = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+
+            const status = localStorage.getItem('status');
+            if (status !== null) {
+                statusCheckbox.checked = status === 'true';
+                statusText.textContent = status === 'true' ? 'Aktif' : 'Tidak Aktif';
+            }
+
+            statusCheckbox.addEventListener('change', function() {
+                localStorage.setItem('status', this.checked);
+                statusText.textContent = this.checked ? 'Aktif' : 'Tidak Aktif';
+            });
+        });
+    </script>
 </x-dashboard-layout>
