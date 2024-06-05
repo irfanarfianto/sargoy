@@ -46,9 +46,9 @@
         </div>
         <div class="flex items-center justify-center mt-4">
             <a href="{{ route('login.google') }}">
-                <x-button.icon icon="fa-brands fa-google">
+                <x-button.text-icon icon="fa-brands fa-google">
                     <strong>{{ __('Masuk dengan Google') }}</strong>
-                </x-button.icon>
+                </x-button.text-icon>
             </a>
         </div>
     </form>
