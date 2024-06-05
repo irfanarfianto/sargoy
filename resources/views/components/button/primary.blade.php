@@ -1,7 +1,7 @@
 <!-- resources/views/components/button/primary.blade.php -->
 <button
     {{ $attributes->merge(['type' => 'submit', 'class' => 'relative text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800']) }}>
-    <span class="absolute inset-0 flex items-center justify-center hidden" id="loader">
+    <span class="absolute inset-0 flex items-center justify-center" id="loader">
         <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor"

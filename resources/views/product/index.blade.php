@@ -51,7 +51,7 @@
                             price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
                     @endforeach
                 </div>
-                <div class="flex flex-col gap-6 hidden" id="listView">
+                <div class="flex flex-col gap-6" id="listView">
                     @foreach ($products as $product)
                         <x-card.product-list image="https://placehold.co/400" title="{{ $product->product_name }}"
                             price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
