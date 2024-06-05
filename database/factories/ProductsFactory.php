@@ -18,7 +18,6 @@ class ProductsFactory extends Factory
     {
         return [
             'product_name' => $this->faker->sentence(3),
-            'images' => $this->faker->imageUrl(360, 360, 'clothes', true),
             'description' => $this->faker->paragraph(10),
             'price' => $this->faker->numberBetween(10000, 100000),
         ];

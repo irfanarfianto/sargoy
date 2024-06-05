@@ -96,30 +96,36 @@ button:hover {
 <body>
     <div class="container">
         <h1>Update Product</h1>
-        <form action="{{ route('product.update', ['id' => $product->id]) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('product.update', $product->slug) }}" method="POST" enctype="multipart/form-data">
             @csrf
-            @method('PUT')
-            <div class="form-group">
-                <label for="name">Nama Produk:</label>
-                <input type="text" id="product_name" name="product_name" value="{{ $product->product_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" required> {{ $product->description }} </textarea>
-            </div>
-            <div class="form-group">
-                <label for="current_image">Current Image:</label><br>
-                <img src="{{ asset($product->images) }}" alt="{{ $product->product_name }}" style="max-width: 100px; max-height: 100px;">
-            </div>
-            <div class="form-group">
-                <label for="images">Images:</label>
-                <input type="file" id="images" name="images">
-            </div>
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="text" id="price" name="price" value="{{ $product->price }}" required>
-            </div>
-            <button type="submit">Create</button>
+        @method('PUT')
+        <div>
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" value="{{ old('product_name', $product->product_name) }}">
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description">{{ old('description', $product->description) }}</textarea>
+        </div>
+        <div>
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" value="{{ old('price', $product->price) }}">
+        </div>
+        <div>
+            <label for="images">Images:</label>
+            <input type="file" id="images" name="images[]" multiple accept="image/*">
+        </div>
+        <div>
+            <label for="categories">Categories:</label>
+            <select id="categories" name="categories[]" multiple>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" {{ $product->categories->contains($category) ? 'selected' : '' }}>{{ $category->category_name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <button type="submit">Update Product</button>
+        </div>
         </form>
     </div>
 </body>

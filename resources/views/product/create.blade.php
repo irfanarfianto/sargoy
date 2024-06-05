@@ -1,121 +1,87 @@
-<!-- resources/views/product/create.blade.php -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Product</title>
-    <style>
+<x-dashboard-layout>
+    <div class="items-center mt-14">
+        <div class="flex items-center justify-between flex-wrap w-full max-w-screen-xl">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Tambah Produk Baru') }}
+            </h2>
+            {{-- tombol kembali dan simpan --}}
+            <div class="flex">
+                <a href="{{ route('product.index') }}">
+                    <x-button.secondary>
+                        Kembali
+                    </x-button.secondary>
+                </a>
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
-}
+                <x-button.primary form="product-form" type="submit">
+                    Simpan
+                </x-button.primary>
+            </div>
+        </div>
+    </div>
 
-.container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-.form-group textarea {
-    height: 100px;
-    resize: vertical;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-.alert {
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-
-.alert ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Create Product</h1>
+    <div class="flex mt-3.5">
         <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="form-group">
-                <label for="name">Nama Produk:</label>
-                <input type="text" id="product_name" name="product_name" required>
+            {{-- tampilan kiri --}}
+            <div class="flex flex-col w-full lg:w-2/3">
+                <div class="mb-4">
+                    <x-label.input for="product_name" :value="__('Nama Produk')" />
+                    <x-input.text type="text" id="product_name" name="product_name" value="{{ old('product_name') }}"
+                        required autofocus />
+                    <x-error.input-error :messages="$errors->get('product_name')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-label.input for="description" :value="__('Deskripsi Produk')" />
+                    <x-input.text type="text" id="description" name="description" value="{{ old('description') }}"
+                        required />
+                    <x-error.input-error :messages="$errors->get('description')" class="mt-2" />
+                </div>
             </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" required></textarea>
+
+            {{-- tampilan kanan --}}
+            <div class="flex flex-col w-full lg:w-1/4">
+                <div class="mb-4">
+                    <x-label.input for="price" :value="__('Harga Produk')" />
+                    <x-input.text type="text" id="price" name="price" value="{{ old('price') }}" required />
+                    <x-error.input-error :messages="$errors->get('price')" class="mt-2" />
+                </div>
             </div>
-            <div class="form-group">
-                <label for="images">Images:</label>
-                <input type="file" id="images" name="images" required>
-            </div>
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="text" id="price" name="price" value="{{ old('price') }}" required>
-            </div>
-            <button type="submit">Create</button>
         </form>
     </div>
-</body>
-</html>
+
+    <script>
+        function formatRupiah(element) {
+            let value = element.value;
+            value = value.replace(/[^,\d]/g, "").toString();
+            let split = value.split(",");
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? "." : "";
+                rupiah += separator + ribuan.join(".");
+            }
+
+            rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+            element.value = rupiah ? "Rp. " + rupiah : "";
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const statusCheckbox = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+
+            const status = localStorage.getItem('status');
+            if (status !== null) {
+                statusCheckbox.checked = status === 'true';
+                statusText.textContent = status === 'true' ? 'Aktif' : 'Tidak Aktif';
+            }
+
+            statusCheckbox.addEventListener('change', function() {
+                localStorage.setItem('status', this.checked);
+                statusText.textContent = this.checked ? 'Aktif' : 'Tidak Aktif';
+            });
+        });
+    </script>
+</x-dashboard-layout>

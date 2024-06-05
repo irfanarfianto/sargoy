@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Products;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -12,7 +12,7 @@ class HomeController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $products = Products::all();
+        $products = Product::all();
         return view(
             'home', compact('products')
         );

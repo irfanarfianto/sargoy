@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Products;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Support\Str;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
@@ -12,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Products::all();
+        $products = Product::paginate(10);
         return view('product.index', compact('products'));
     }
 
@@ -21,7 +25,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('product.create');
+
+        $categories = Category::all();
+        return view('product.create', compact('categories'));
     }
 
     /**
@@ -29,92 +35,111 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate form data
-        $validatedData = $request->validate([
-            'product_name' => 'required',
-            'images' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'description' => 'required',
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ]);
-    
-        // Handle file upload
+
+        $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
+
+        // Create product with unique slug
+        $product = Product::create([
+            'product_name' => $request->input('product_name'),
+            'description' => $request->input('description'),
+            'price' => $request->input('price'),
+            'slug' => $slug
+        ]);
+
+        // Save product images if present
         if ($request->hasFile('images')) {
-            $image = $request->file('images');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $validatedData['images'] = 'images/' . $imageName;
+            foreach ($request->file('images') as $image) {
+                $imagePath = $image->store('product_images');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $imagePath,
+                ]);
+            }
         }
 
-        Products::create($validatedData);
+        // Attach categories to the product
+        $product->categories()->attach($request->input('categories'));
 
-        return redirect()->route('product.index');
+        return redirect()->route('product.index')->with('success', 'Product created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        $product = Products::findOrFail($id);
-        dd($product->product_name);
-        // return view('product.show', compact('product'));
+        $product = Product::where('slug', $slug)->firstOrFail();
+        return view('product.show', compact('product'));
+        // return response()->json($product, 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $slug)
     {
-        $product = Products::findOrFail($id);
-        return view('product.edit', compact('product'));
+        $categories = Category::all();
+        $product = Product::where('slug', $slug)->firstOrFail();
+        return view('product.edit', compact('product', 'categories'));
+        // return response()->json($product, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $slug)
     {
-        // Validasi input
-        $validatedData = $request->validate([
-            'product_name' => 'required',
-            'images' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'description' => 'required',
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
-        $product = Products::findOrFail($id);
+        $product->update($request->only(['product_name', 'description', 'price']));
 
         if ($request->hasFile('images')) {
-            if ($product->images && file_exists(public_path($product->images))) {
-                unlink(public_path($product->images));
-            }
+            $product->images()->delete();
 
-            $image = $request->file('images');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $validatedData['images'] = 'images/' . $imageName;
-        } else {
-            $validatedData['images'] = $product->images;
+            foreach ($request->file('images') as $image) {
+                $imagePath = $image->store('product_images');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $imagePath,
+                ]);
+            }
         }
 
-        $product->update($validatedData);
+        $product->categories()->detach();
+        foreach ($request->input('categories') as $categoryId) {
+            $product->categories()->attach($categoryId, ['product_id' => $product->id]);
+        }
 
-        return redirect()->route('product.index');
+        return redirect()->route('product.index')->with('success', 'Product updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $slug)
     {
-        $product = Products::findOrFail($id);
 
-        if ($product->images && file_exists(public_path($product->images))) {
-            unlink(public_path($product->images));
-        }
-
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $product->images()->delete();
+        $product->categories()->detach();
         $product->delete();
-
-        return redirect()->route('product.index');
+        return redirect()->route('product.index')->with('success', 'Product Delete successfully.');
+        // return response()->json($product, 200);
     }
 }
