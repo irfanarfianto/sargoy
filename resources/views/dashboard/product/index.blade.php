@@ -11,7 +11,7 @@
             </a>
         </div>
         <div class="flex items-center gap-x-1">
-            <form action="{{ route('product.index') }}" method="GET">
+            <form action="{{ route('dashboard.product.index') }}" method="GET">
                 <div class="relative">
                     <x-input.text id="search" name="search" type="text" placeholder="Cari..." />
 
@@ -40,16 +40,16 @@
                     class="z-10 hidden bg-gray-100 divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                     <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="{{ route('product.index', ['sort' => 'latest']) }}"
+                            <a href="{{ route('dashboard.product.index', ['sort' => 'latest']) }}"
                                 class="block px-4 py-2 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('sort') == 'latest' ? 'bg-gray-100 dark:bg-gray-600 text-blue-500' : '' }}">Terbaru</a>
                         </li>
                         <li>
-                            <a href="{{ route('product.index', ['sort' => 'price_asc']) }}"
+                            <a href="{{ route('dashboard.product.index', ['sort' => 'price_asc']) }}"
                                 class="block px-4 py-2 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('sort') == 'price_asc' ? 'bg-gray-100 dark:bg-gray-600 text-blue-500' : '' }}">Harga
                                 Terendah</a>
                         </li>
                         <li>
-                            <a href="{{ route('product.index', ['sort' => 'price_desc']) }}"
+                            <a href="{{ route('dashboard.product.index', ['sort' => 'price_desc']) }}"
                                 class="block px-4 py-2 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('sort') == 'price_desc' ? 'bg-gray-100 dark:bg-gray-600 text-blue-500' : '' }}">Harga
                                 Tertinggi</a>
                         </li>

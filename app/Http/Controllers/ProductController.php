@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,21 +14,44 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        $hasAdminRole = $user ? $user->hasRole('admin') : false;
-        $hasSellerRole = $user ? $user->hasRole('seller') : false;
-        $paginateCount = $hasAdminRole || $hasSellerRole ? 10 : 12;
 
-        if ($hasAdminRole || $hasSellerRole) {
-            $products = Product::paginate($paginateCount);
-            $products->getCollection()->transform(function ($product) {
-                $product->price = number_format($product->price, 0, ',', '.');
-                return $product;
-            });
-            return view('dashboard.product.index', compact('products'));
-        } else {
-            return redirect()->route('product.index');
-        }
+        $products = Product::paginate(10);
+        $products->getCollection()->transform(function ($product) {
+            $product->price = number_format($product->price, 0, ',', '.');
+            return $product;
+        });
+
+        return view('dashboard.product.index', compact('products'));
+    }
+
+    /**
+     * Display a listing of the resource for the public.
+     */
+    public function publicIndex()
+    {
+        $products = Product::paginate(9);
+        $products->getCollection()->transform(function ($product) {
+            $product->price = number_format($product->price, 0, ',', '.');
+            return $product;
+        });
+
+        $categories = Category::all();
+
+        return view('product.index', compact('products', 'categories'));
+    }
+
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->price = number_format($product->price, 0, ',', '.');
+
+        $breadcrumbItems = [
+            ['name' => 'Beranda', 'url' => '/'],
+            ['name' => 'Produk', 'url' => route('public.product.index')],
+            ['name' => $product->product_name],
+        ];
+
+        return view('product.show', compact('product', 'breadcrumbItems'));
     }
 
     /**
@@ -83,5 +107,14 @@ class ProductController extends Controller
 
         return redirect()->route('dashboard.product.index');
     }
-}
 
+    public function loadMoreProducts(Request $request)
+    {
+        $offset = $request->input('offset');
+        $limit = 6;
+
+        $products = Product::skip($offset)->take($limit)->get();
+
+        return response()->json($products);
+    }
+}
