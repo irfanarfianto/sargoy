@@ -48,13 +48,13 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6" id="gridView">
                     @foreach ($products as $product)
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
+                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->slug }}" />
                     @endforeach
                 </div>
                 <div class="flex flex-col gap-6" id="listView">
                     @foreach ($products as $product)
                         <x-card.product-list image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
+                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->slug }}" />
                     @endforeach
                 </div>
                 <div class="flex justify-center mt-6">

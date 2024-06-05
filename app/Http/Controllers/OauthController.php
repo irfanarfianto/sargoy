@@ -32,10 +32,10 @@ class OauthController extends Controller
                     'email' => $user->email,
                     'gauth_id' => $user->id,
                     'gauth_type' => 'google',
-                    // 'password' => encrypt('')
+                    'password' => encrypt('')
                 ]);
 
-                $newUser->givePermissionTo('view catalog');
+                $newUser->assignRole('visitor');
 
                 Auth::login($newUser);
 

@@ -25,7 +25,7 @@
                 @if ($count++ < 8)
                     <swiper-slide>
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
+                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->slug }}" />
                     </swiper-slide>
                 @endif
             @endforeach
@@ -113,7 +113,7 @@
                 @if ($count++ < 8)
                     <swiper-slide>
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
+                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->slug }}" />
                     </swiper-slide>
                 @endif
             @endforeach
@@ -169,7 +169,7 @@
                 @if ($count++ < 8)
                     <swiper-slide>
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
+                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->slug }}" />
                     </swiper-slide>
                 @endif
             @endforeach

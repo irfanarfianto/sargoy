@@ -7,11 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'category_name',
-        'images', 'position',
+        'images',
+        'position',
         'meta_keyword',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::factory(function ($category) {
+            return new \Database\Factories\CategoryFactory();
+        });
+    }
 
     public function products()
     {
