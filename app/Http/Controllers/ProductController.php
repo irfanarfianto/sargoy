@@ -7,6 +7,8 @@ use App\Models\Product;
 use Illuminate\Support\Str;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
@@ -17,25 +19,51 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::paginate(10);
-        return view('product.index', compact('products'));
+        $products->getCollection()->transform(function ($product) {
+            $product->price = number_format($product->price, 0, ',', '.');
+            return $product;
+        });
+
+        return view('dashboard.product.index', compact('products'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource for the public.
      */
-    public function create()
+    public function publicIndex()
     {
+        $products = Product::paginate(9);
+        $products->getCollection()->transform(function ($product) {
+            $product->price = number_format($product->price, 0, ',', '.');
+            return $product;
+        });
 
         $categories = Category::all();
-        return view('product.create', compact('categories'));
+
+        return view('product.index', compact('products', 'categories'));
     }
+
+    public function show($slug)
+    {
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $product->price = number_format($product->price, 0, ',', '.');
+
+        $breadcrumbItems = [
+            ['name' => 'Beranda', 'url' => '/'],
+            ['name' => 'Produk', 'url' => route('public.product.index')],
+            ['name' => $product->product_name],
+        ];
+
+        return view('product.show', compact('product', 'breadcrumbItems'));
+    }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'product_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
@@ -44,14 +72,15 @@ class ProductController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
+        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
         $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
 
         // Create product with unique slug
         $product = Product::create([
             'product_name' => $request->input('product_name'),
             'description' => $request->input('description'),
-            'price' => $request->input('price'),
-            'slug' => $slug
+            'price' => $validatedData['price'],
+            'slug' => $slug,
         ]);
 
         // Save product images if present
@@ -68,19 +97,12 @@ class ProductController extends Controller
         // Attach categories to the product
         $product->categories()->attach($request->input('categories'));
 
-        return redirect()->route('product.index')->with('success', 'Product created successfully.');
+        return redirect()->route('dashboard.product.index')->with('success', 'Product created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $slug)
-    {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        return view('product.show', compact('product'));
-        // return response()->json($product, 200);
-    }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -89,7 +111,6 @@ class ProductController extends Controller
         $categories = Category::all();
         $product = Product::where('slug', $slug)->firstOrFail();
         return view('product.edit', compact('product', 'categories'));
-        // return response()->json($product, 200);
     }
 
     /**
@@ -97,8 +118,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $request->validate([
+        $validatedData = $request->validate([
             'product_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
@@ -107,11 +127,13 @@ class ProductController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
-        $product->update($request->only(['product_name', 'description', 'price']));
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+        $product->update($validatedData);
 
+        // Update product images if present
         if ($request->hasFile('images')) {
             $product->images()->delete();
-
             foreach ($request->file('images') as $image) {
                 $imagePath = $image->store('product_images');
                 ProductImage::create([
@@ -121,12 +143,10 @@ class ProductController extends Controller
             }
         }
 
-        $product->categories()->detach();
-        foreach ($request->input('categories') as $categoryId) {
-            $product->categories()->attach($categoryId, ['product_id' => $product->id]);
-        }
+        // Update product categories
+        $product->categories()->sync($request->input('categories'));
 
-        return redirect()->route('product.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('dashboard.product.index')->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -134,12 +154,27 @@ class ProductController extends Controller
      */
     public function destroy(string $slug)
     {
-
         $product = Product::where('slug', $slug)->firstOrFail();
         $product->images()->delete();
         $product->categories()->detach();
         $product->delete();
-        return redirect()->route('product.index')->with('success', 'Product Delete successfully.');
-        // return response()->json($product, 200);
+        return redirect()->route('dashboard.product.index')->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * Load more products for infinite scroll.
+     */
+    public function loadMoreProducts(Request $request)
+    {
+        $offset = $request->input('offset');
+        $limit = 9;
+
+        $products = Product::skip($offset)->take($limit)->get();
+        $products->transform(function ($product) {
+            $product->price = number_format($product->price, 0, ',', '.');
+            return $product;
+        });
+
+        return response()->json($products);
     }
 }

@@ -1,67 +1,65 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use \App\Http\Controllers;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OauthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\TentangKamiController;
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FAQController;
 
-Route::get('/', Controllers\HomeController::class);
-
-Route::get('/login/google', [Controllers\OauthController::class, 'redirectToProvider'])->name('login.google');
-Route::get('/login/google/callback', [Controllers\OauthController::class, 'handleProviderCallback'])->name('login.google.callback');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [Controllers\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    Route::get('/admin', [Controllers\AdminController::class, 'index'])->name('admin.dashboard');
-
-    // EDIT Admin
-    Route::get('/admin/edit', [Controllers\AdminController::class, 'edit'])->name('admin.edit');
-    Route::patch('/admin/edit', [Controllers\AdminController::class, 'update'])->name('admin.update');
-    Route::delete('/admin/edit', [Controllers\AdminController::class, 'destroy'])->name('admin.destroy');
-});
-Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
-    Route::get('/seller', [Controllers\SellerController::class, 'index'])->name('seller.dashboard');
-
-
-    // EDIT SELLER
-    Route::get('/seller/edit', [Controllers\SellerController::class, 'edit'])->name('seller.edit');
-    Route::patch('/seller/edit', [Controllers\SellerController::class, 'update'])->name('seller.update');
-    Route::delete('/seller/edit', [Controllers\SellerController::class, 'destroy'])->name('seller.destroy');
-});
-
-
-Route::get('/produk', [ProductController::class, 'index'])->name('product.index');
-Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
-Route::post('/produk', [ProductController::class, 'store'])->name('product.store');
+// ROLE PUBLIC
+Route::get('/', HomeController::class)->name('home');
+Route::get('/login/google', [OauthController::class, 'redirectToProvider'])->name('login.google');
+Route::get('/login/google/callback', [OauthController::class, 'handleProviderCallback'])->name('login.google.callback');
+Route::get('/produk', [ProductController::class, 'publicIndex'])->name('public.product.index');
 Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('product.show');
-Route::get('/produk/{slug}/edit', [ProductController::class, 'edit'])->name('product.edit');
-Route::put('/produk/{slug}', [ProductController::class, 'update'])->name('product.update');
-Route::delete('/produk/{slug}', [ProductController::class, 'destroy'])->name('product.destroy');
-
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
-Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-Route::post('/categories/update-position', [CategoryController::class, 'updatePosition'])->name('categories.updatePosition');
+Route::get('/blogs', [BlogController::class, 'index']);
+Route::get('/tentang-kami', [TentangKamiController::class, 'index']);
 
-Route::get('/blogs', [Controllers\BlogController::class, 'index']);
+Route::get('/load-more-products', [ProductController::class, 'loadMoreProducts']);
 
-Route::get('/tentang-kami', [Controllers\TentangKamiController::class, 'index']);
+// ROLE ADMIN dan SELLER
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+// ROLE SELLER
+Route::middleware(['auth', 'verified', 'role:seller'])->group(function () {
+    Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
+    Route::get('/seller/dashboard/edit', [SellerController::class, 'edit'])->name('seller.edit');
+    Route::patch('/seller/dashboard/edit', [SellerController::class, 'update'])->name('seller.update');
+    Route::delete('/seller/dashboard/edit', [SellerController::class, 'destroy'])->name('seller.destroy');
 
-// Route::middleware(['auth', 'verified', 'role:admin'])->group(
-//     function () {
-//         Route::resource('faqs', Controllers\FAQController::class);
-//     }
-// );
+    Route::get('/dashboard/produk', [ProductController::class, 'index'])->name('dashboard.product.index');
+    Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/produk', [ProductController::class, 'store'])->name('product.store');
+    Route::get('/produk/{slug}/edit', [ProductController::class, 'edit'])->name('product.edit');
+    Route::put('/produk/{slug}', [ProductController::class, 'update'])->name('product.update');
+    Route::delete('/produk/{slug}', [ProductController::class, 'destroy'])->name('product.destroy');
+});
 
-Route::resource('faqs', Controllers\FAQController::class);
+// ROLE ADMIN
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard/edit', [AdminController::class, 'edit'])->name('admin.edit');
+    Route::patch('/admin/dashboard/edit', [AdminController::class, 'update'])->name('admin.update');
+    Route::delete('/admin/dashboard/edit', [AdminController::class, 'destroy'])->name('admin.destroy');
+
+    Route::get('/dashboard/produk', [ProductController::class, 'index'])->name('dashboard.product.index');
+    Route::resource('faqs', FAQController::class);
+
+    Route::get('/produk/create', [ProductController::class, 'create'])->name('product.create');
+    Route::get('/produk/{slug}/edit', [ProductController::class, 'edit'])->name('product.edit');
+    Route::put('/produk/{slug}', [ProductController::class, 'update'])->name('product.update');
+    Route::delete('/produk/{slug}', [ProductController::class, 'destroy'])->name('product.destroy');
+});
 
 require __DIR__ . '/auth.php';

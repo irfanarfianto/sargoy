@@ -13,12 +13,12 @@ class SellerController extends Controller
 {
     public function index()
     {
-        return view('seller.index');
+        return view('dashboard.seller.index');
     }
 
     public function edit(Request $request): View
     {
-        return view('seller.edit', [
+        return view('dashboard.seller.edit', [
             'user' => $request->user(),
         ]);
     }
@@ -33,7 +33,7 @@ class SellerController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('seller.edit')->with('status', 'profile-updated');
+        return Redirect::route('dashboard.seller.edit')->with('status', 'profile-updated');
     }
 
     public function destroy(Request $request): RedirectResponse

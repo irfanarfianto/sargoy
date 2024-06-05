@@ -13,12 +13,12 @@ class AdminController extends Controller
 {
     public function index()
     {
-        return view('admin.index');
+        return view('dashboard.admin.index');
     }
 
     public function edit(Request $request): View
     {
-        return view('admin.edit', [
+        return view('dashboard.admin.edit', [
             'user' => $request->user(),
         ]);
     }
@@ -33,7 +33,7 @@ class AdminController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('admin.edit')->with('status', 'profile-updated');
+        return Redirect::route('dashboard.admin.edit')->with('status', 'profile-updated');
     }
 
     public function destroy(Request $request): RedirectResponse

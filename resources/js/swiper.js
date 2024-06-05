@@ -1,5 +1,7 @@
 import Swiper from "swiper/bundle";
-
+import { register } from "swiper/element/bundle";
+// register Swiper custom elements
+register();
 // import styles bundle
 import "swiper/css/bundle";
 
@@ -7,7 +9,6 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
 
 const swiper = new Swiper(".swiper", {
     modules: [Navigation, Pagination],
