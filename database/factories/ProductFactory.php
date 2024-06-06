@@ -2,13 +2,17 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Faker\Factory as FakerFactory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
 class ProductFactory extends Factory
 {
+    protected $model = Product::class;
+
     /**
      * Define the model's default state.
      *
@@ -16,12 +20,15 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        // Buat instance Faker dengan lokal Indonesia
+        $faker = FakerFactory::create('id_ID');
+
         return [
-            'product_name' => $this->faker->sentence(3),
-            'description' => $this->faker->paragraph(5),
-            'price' => $this->faker->numberBetween(10000, 100000),
-            'slug' => $this->faker->slug(),
-            // Add more columns and their default values if needed
+            'product_name' => $faker->sentence(3),
+            'description' => $faker->paragraph(5),
+            'price' => $faker->numberBetween(10000, 100000),
+            'slug' => $faker->slug(),
+            // Tambahkan lebih banyak kolom dan nilai default jika diperlukan
         ];
     }
 }
