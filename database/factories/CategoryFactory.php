@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Faker\Factory as FakerFactory;
 
 class CategoryFactory extends Factory
 {
@@ -21,11 +22,13 @@ class CategoryFactory extends Factory
      */
     public function definition()
     {
+        // Buat instance Faker dengan lokal Indonesia
+        $faker = FakerFactory::create('id_ID');
+
         return [
-            'category_name' => $this->faker->word(),
-            'position' => $this->faker->numberBetween(1, 100),
-            'meta_keyword' => $this->faker->words(3, true),
-            'images' => $this->faker->imageUrl(),
+            'category_name' => $faker->word(),
+            'meta_keyword' => $faker->words(3, true),
+            'images' => $faker->imageUrl(),
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -39,7 +42,7 @@ class CategoryFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Category $category) {
-            // Additional actions after category creation if needed
+            // Tambahkan tindakan tambahan setelah pembuatan kategori jika diperlukan
         });
     }
 }
