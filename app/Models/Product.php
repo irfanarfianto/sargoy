@@ -13,8 +13,17 @@ class Product extends Model
         'product_name',
         'description',
         'price',
-        'slug'
+        'slug',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::factory(function ($product) {
+            return new \Database\Factories\ProductFactory();
+        });
+    }
 
     public function images()
     {
@@ -23,6 +32,8 @@ class Product extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'product_category');
+        return $this->belongsToMany(Category::class, 'product_category')
+        ->using(ProductCategory::class)
+            ->withTimestamps();
     }
 }

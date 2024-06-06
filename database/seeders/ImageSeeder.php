@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ProductsSeeder extends Seeder
+class ImageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,15 +15,10 @@ class ProductsSeeder extends Seeder
     public function run(): void
     {
         $products = Product::factory()->count(50)->create();
-        $categories = Category::factory()->count(5)->create();
 
+        // For each product, create 1 to 5 images
         foreach ($products as $product) {
-            $category = $categories->random();
-
-            $product->categories()->attach($category);
-
-            
-            $imageCount = rand(1, 4);
+            $imageCount = rand(1, 5); // Random number of images per product
             ProductImage::factory()->count($imageCount)->create([
                 'product_id' => $product->id,
             ]);

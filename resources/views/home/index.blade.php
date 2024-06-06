@@ -3,6 +3,20 @@
         <x-carousel />
     </div>
 
+    <section class="py-6 max-w-screen-xl mx-auto px-4 sm:px-6">
+        <swiper-container id="mySwiper0" class="mySwiper" space-between="5" free-mode="true">
+            @foreach ($categories as $category)
+                <swiper-slide>
+                    <div class="flex flex-col items-center justify-center">
+                        <img src="{{ $category->images }}" alt="{{ $category->name }}"
+                            class="w-24 h-24 object-cover rounded-full mb-4">
+                        <h2 class="text-center text-lg font-bold text-gray-800">{{ $category->category_name }}</h2>
+                    </div>
+                </swiper-slide>
+            @endforeach
+        </swiper-container>
+    </section>
+
     <section class="py-4 max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="flex justify-between mb-6">
             <h1 class="flex text-3xl font-bold text-gray-800 justify-start">Produk terbaru</h1>
@@ -18,19 +32,19 @@
             </div>
         </div>
         <swiper-container id="mySwiper1" class="mySwiper" space-between="30" free-mode="true" navigation="true">
-            @php
-                $count = 0;
-            @endphp
-            @foreach ($products as $product)
-                @if ($count++ < 8)
-                    <swiper-slide>
+            @foreach ($products->take(8) as $product)
+                <swiper-slide>
+                    @if ($product->images->isNotEmpty())
+                        <x-card.product image="{{ asset($product->images->first()->image_path) }}"
+                            title="{{ $product->product_name }}" price="{{ $product->price }}"
+                            link="/produk/{{ $product->slug }}" />
+                    @else
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
-                    </swiper-slide>
-                @endif
+                            price="{{ $product->price }}" link="/produk/{{ $product->slug }}" />
+                    @endif
+                </swiper-slide>
             @endforeach
         </swiper-container>
-        </div>
         <div class="flex justify-center mt-4">
             <a href="{{ route('public.product.index') }}">
                 <x-button.secondary>
@@ -81,7 +95,7 @@
                         <li class="text-blue-500">Karakteristik unik yang menarik</li>
                         <li class="text-blue-500">Dibuat secara manual</li>
                     </ul>
-                    <div class="mt-4 ">
+                    <div class="mt-4">
                         <x-button.secondary href="{{ route('public.product.index') }}">
                             Lihat Semua <i class="ms-1 fa-solid fa-arrow-right"></i>
                         </x-button.secondary>
@@ -106,16 +120,17 @@
             </div>
         </div>
         <swiper-container id="mySwiper2" class="mySwiper" space-between="30" free-mode="true" navigation="true">
-            @php
-                $count = 0;
-            @endphp
-            @foreach ($products as $product)
-                @if ($count++ < 8)
-                    <swiper-slide>
+            @foreach ($products->take(8) as $product)
+                <swiper-slide>
+                    @if ($product->images->isNotEmpty())
+                        <x-card.product image="{{ asset($product->images->first()->image_path) }}"
+                            title="{{ $product->product_name }}" price="{{ $product->price }}"
+                            link="/produk/{{ $product->slug }}" />
+                    @else
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
-                    </swiper-slide>
-                @endif
+                            price="{{ $product->price }}" link="/produk/{{ $product->slug }}" />
+                    @endif
+                </swiper-slide>
             @endforeach
         </swiper-container>
         <div class="flex justify-center mt-4">
@@ -126,7 +141,6 @@
             </a>
         </div>
     </section>
-
 
     <section class="py-4 max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="bg-gray-50 py-12">
@@ -147,6 +161,8 @@
         </div>
     </section>
 
+
+
     <section class="py-4 max-w-screen-xl mx-auto px-4 sm:px-6">
         <div class="flex justify-between mb-6">
             <h1 class="flex text-3xl font-bold text-gray-800 justify-start">Semua Produk</h1>
@@ -162,16 +178,17 @@
             </div>
         </div>
         <swiper-container id="mySwiper3" class="mySwiper" space-between="30" free-mode="true" navigation="true">
-            @php
-                $count = 0;
-            @endphp
-            @foreach ($products as $product)
-                @if ($count++ < 8)
-                    <swiper-slide>
+            @foreach ($products->take(8) as $product)
+                <swiper-slide>
+                    @if ($product->images->isNotEmpty())
+                        <x-card.product image="{{ asset($product->images->first()->image_path) }}"
+                            title="{{ $product->product_name }}" price="{{ $product->price }}"
+                            link="/produk/{{ $product->slug }}" />
+                    @else
                         <x-card.product image="https://placehold.co/400" title="{{ $product->product_name }}"
-                            price="Rp: {{ $product->price }}" link="/produk/{{ $product->id }}" />
-                    </swiper-slide>
-                @endif
+                            price="{{ $product->price }}" link="/produk/{{ $product->slug }}" />
+                    @endif
+                </swiper-slide>
             @endforeach
         </swiper-container>
         <div class="flex justify-center mt-4">
@@ -184,10 +201,29 @@
     </section>
 
 </x-app-layout>
+
 <script>
+    const swiperEl0 = document.getElementById('mySwiper0');
     const swiperEl1 = document.getElementById('mySwiper1');
     const swiperEl2 = document.getElementById('mySwiper2');
     const swiperEl3 = document.getElementById('mySwiper3');
+
+    Object.assign(swiperEl0, {
+        breakpoints: {
+            640: {
+                slidesPerView: 4,
+                spaceBetween: 20,
+            },
+            768: {
+                slidesPerView: 5,
+                spaceBetween: 40,
+            },
+            1024: {
+                slidesPerView: 6,
+                spaceBetween: 50,
+            },
+        },
+    });
 
     Object.assign(swiperEl1, {
         breakpoints: {
@@ -251,5 +287,9 @@
             prevEl: '.swiper-button-prev-3',
         },
     });
-    swiperEl.initialize();
+
+    swiperEl0.initialize();
+    swiperEl1.initialize();
+    swiperEl2.initialize();
+    swiperEl3.initialize();
 </script>
