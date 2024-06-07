@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Faker\Factory as FakerFactory;
+use Illuminate\Support\Str;
 
 class CategoryFactory extends Factory
 {
@@ -24,9 +25,11 @@ class CategoryFactory extends Factory
     {
         // Buat instance Faker dengan lokal Indonesia
         $faker = FakerFactory::create('id_ID');
+        $categoryName = $this->faker->word;
 
         return [
             'category_name' => $faker->word(),
+            'slug' => Str::slug($categoryName),
             'meta_keyword' => $faker->words(3, true),
             'images' => $faker->imageUrl(),
             'created_at' => now(),

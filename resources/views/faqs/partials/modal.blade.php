@@ -45,19 +45,15 @@
                     <x-label.input class="block text-gray-700 text-sm font-bold mb-2" for="jawaban">
                         Jawaban
                     </x-label.input>
-                    <textarea
-                        class="block p-2.5 w-full h-36 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        id="jawaban" placeholder="Masukkan jawaban" name="jawaban"></textarea>
+                    <x-input.textarea id="jawaban" placeholder="Masukkan jawaban" name="jawaban"></x-input.textarea>
                     @error('jawaban')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="flex items-center justify-between">
-                    <button
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="submit">
+                    <x-button.primary type="submit">
                         Submit
-                    </button>
+                    </x-button.primary>
                 </div>
             </form>
         </div>
@@ -125,7 +121,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Delete modal -->
     <div id="delete-modal-{{ $index }}" tabindex="-1" aria-hidden="true"

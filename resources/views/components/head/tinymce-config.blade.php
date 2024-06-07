@@ -2,8 +2,9 @@
     referrerpolicy="origin"></script>
 <script>
     tinymce.init({
-        selector: 'textarea#description',
+        selector: 'textarea',
         plugins: 'lists link',
+        height: 250,
         toolbar: 'undo redo | bold italic underline | bullist numlist | link',
         menubar: false
     });

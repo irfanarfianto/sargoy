@@ -1,17 +1,31 @@
 <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
     <ul class="space-y-2 font-medium">
         <li>
-            <a href="{{ auth()->user()->hasRole('seller') ? route('seller.dashboard') : route('admin.dashboard') }}"
-                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-400 dark:hover:bg-gray-700 group {{ Request::route()->getName() == 'seller.dashboard' ? 'bg-blue-400 dark:bg-gray-700' : '' }}">
-                <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                    <path
-                        d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                    <path
-                        d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                </svg>
-                <span class="ms-3">Dashboard</span>
-            </a>
+            @if (auth()->check())
+                <a href="{{ auth()->user()->hasRole('seller') ? route('seller.dashboard') : route('admin.dashboard') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-400 dark:hover:bg-gray-700 group {{ Request::route()->getName() == 'seller.dashboard' ? 'bg-blue-400 dark:bg-gray-700' : '' }}">
+                    <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                        <path
+                            d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                        <path
+                            d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                    </svg>
+                    <span class="ms-3">Dashboard</span>
+                </a>
+            @else
+                <a href="{{ route('login') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-400 dark:hover:bg-gray-700 group">
+                    <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                        <path
+                            d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                        <path
+                            d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                    </svg>
+                    <span class="ms-3">Dashboard</span>
+                </a>
+            @endif
         </li>
         <li>
             <a href="#"
@@ -48,7 +62,7 @@
                         Produk</a>
                 </li>
                 <li>
-                    <a href="{{ Route('categories.index') }}"
+                    <a href="{{ Route('dashboard.categories.index') }}"
                         class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-blue-400 dark:text-white dark:hover:bg-gray-700">Kategori</a>
                 </li>
             </ul>
@@ -66,7 +80,7 @@
                     class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
             </a>
         </li>
-        @if (auth()->user()->hasRole('admin'))
+        @if (auth()->check() && auth()->user()->hasRole('admin'))
             <li>
                 <a href="#"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-400 dark:hover:bg-gray-700 group">
@@ -122,7 +136,7 @@
     </ul>
     <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-300 dark:border-gray-700">
         <li>
-            <a href="{{ auth()->user()->hasRole('seller') ? route('seller.edit') : route('admin.edit') }}"
+            <a href="{{ auth()->check() && auth()->user()->hasRole('seller') ? route('seller.edit') : route('admin.edit') }}"
                 class="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-blue-400 dark:hover:bg-gray-700 dark:text-white group">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                     class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
@@ -130,7 +144,6 @@
                         d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z"
                         clip-rule="evenodd" />
                 </svg>
-
                 <span class="ms-3">Profile</span>
             </a>
         </li>
@@ -145,7 +158,7 @@
                 <span class="ms-3">Panduan Pengguna</span>
             </a>
         </li>
-        @if (auth()->user()->hasRole('seller'))
+        @if (auth()->check() && auth()->user()->hasRole('seller'))
             <li>
                 <a href="{{ route('faqs.index') }}"
                     class="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-blue-400 dark:hover:bg-gray-700 dark:text-white group">

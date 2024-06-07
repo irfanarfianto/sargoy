@@ -24,7 +24,7 @@
                 <!-- Body Modal -->
                 <div class="p-4 md:p-5 space-y-4">
                     <form id="edit-category-form-{{ $category->id }}" method="POST"
-                        action="{{ route('categories.update', ['category' => $category->id]) }}"
+                        action="{{ route('dashboard.categories.update', ['category' => $category->id]) }}"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
@@ -59,7 +59,7 @@
                                 @enderror
                             </div>
                             @if ($category->images)
-                                <img src="{{ asset($category->images) }}" alt="Gambar Saat Ini"
+                                <img src="{{ asset('storage/' . $category->images) }}" alt="Gambar Saat Ini"
                                     class="mt-2 h-24 w-24 object-cover">
                             @endif
                             @error('images')
@@ -81,6 +81,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Modal Hapus Kategori -->
     <div id="delete-category-modal-{{ $category->id }}" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
@@ -114,7 +115,7 @@
                 <div
                     class="flex items-center justify-end p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                     <form id="delete-category-form-{{ $category->id }}" method="POST"
-                        action="{{ route('categories.destroy', ['category' => $category->id]) }}">
+                        action="{{ route('dashboard.categories.destroy', ['category' => $category->id]) }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit"

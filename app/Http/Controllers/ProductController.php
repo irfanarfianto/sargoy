@@ -67,6 +67,14 @@ class ProductController extends Controller
     }
 
 
+    public function create()
+    {
+
+        $categories = Category::all();
+        return view('dashboard.product.create', compact('categories'));
+    }
+
+
     /**
      * Store a newly created resource in storage.
      */

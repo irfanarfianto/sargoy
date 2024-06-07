@@ -1,5 +1,4 @@
 <x-dashboard-layout>
-
     <h2 class="font-semibold mt-14 text-xl text-gray-800 leading-tight">
         {{ __('FAQs') }}
     </h2>
@@ -19,11 +18,12 @@
                 @include('faqs.partials.modal')
             @endif
         @endauth
+
         <!-- Daftar FAQ -->
         <div id="accordion-flush" data-accordion="collapse"
             data-active-classes="bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-white"
             data-inactive-classes="text-gray-500 dark:text-gray-400">
-            @foreach ($faqs as $index => $faq)
+            @forelse ($faqs as $index => $faq)
                 <h2 id="accordion-flush-heading-{{ $index + 1 }}">
                     <button type="button"
                         class="flex items-center justify-between w-full p-5 mb-3 font-medium border border-b-0 border-gray-200 rounded-xl text-gray-500 hover:bg-gray-300 dark:border-gray-700 dark:text-gray-400 gap-3"
@@ -60,7 +60,11 @@
                         @endif
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="text-center text-gray-500 dark:text-gray-400">
+                    <p>Belum ada FAQ yang tersedia.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </x-dashboard-layout>
