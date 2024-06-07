@@ -11,6 +11,8 @@ use App\Http\Controllers\TentangKamiController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FAQController;
+use App\Http\Controllers\ReviewController;
+use App\Models\Review;
 
 // ROLE PUBLIC
 Route::get('/', HomeController::class)->name('home');
@@ -23,6 +25,8 @@ Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/tentang-kami', [TentangKamiController::class, 'index']);
 
 Route::get('/load-more-products', [ProductController::class, 'loadMoreProducts']);
+
+Route::post('/review/{id}', [ReviewController::class, 'reviewPost'])->name('review_post');
 
 // ROLE ADMIN dan SELLER
 Route::middleware(['auth', 'verified'])->group(function () {
