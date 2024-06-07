@@ -9,8 +9,8 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use NumberFormatter;
 use Illuminate\Support\Facades\Auth;
-
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 
 class ProductController extends Controller
 {
@@ -80,46 +80,51 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'product_name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'categories' => 'required|array',
+                'categories.*' => 'exists:categories,id',
+            ]);
 
-        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
-        $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
+            $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+            $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
 
-        // Create product with unique slug
-        $product = Product::create([
-            'product_name' => $request->input('product_name'),
-            'description' => $request->input('description'),
-            'price' => $validatedData['price'],
-            'slug' => $slug,
-        ]);
+            // Create product with unique slug
+            $product = Product::create([
+                'product_name' => $request->input('product_name'),
+                'description' => $request->input('description'),
+                'price' => $validatedData['price'],
+                'slug' => $slug,
+            ]);
 
-        // Save product images if present
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imagePath = $image->store('product_images');
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                ]);
+            // Save product images if present
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $imagePath = $image->store('product_images');
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imagePath,
+                    ]);
+                }
             }
+
+            // Attach categories to the product
+            $product->categories()->attach($request->input('categories'));
+
+            flash()->success('Produk berhasil dibuat.');
+
+            return redirect()->route('dashboard.product.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal membuat produk: ' . $e->getMessage());
+
+            return Redirect::back()->withInput();
         }
-
-        // Attach categories to the product
-        $product->categories()->attach($request->input('categories'));
-
-        return redirect()->route('dashboard.product.index')->with('success', 'Product created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     /**
      * Show the form for editing the specified resource.
      */
@@ -135,35 +140,43 @@ class ProductController extends Controller
      */
     public function update(Request $request, $slug)
     {
-        $validatedData = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'product_name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'categories' => 'required|array',
+                'categories.*' => 'exists:categories,id',
+            ]);
 
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
-        $product->update($validatedData);
+            $product = Product::where('slug', $slug)->firstOrFail();
+            $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+            $product->update($validatedData);
 
-        // Update product images if present
-        if ($request->hasFile('images')) {
-            $product->images()->delete();
-            foreach ($request->file('images') as $image) {
-                $imagePath = $image->store('product_images');
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                ]);
+            // Update product images if present
+            if ($request->hasFile('images')) {
+                $product->images()->delete();
+                foreach ($request->file('images') as $image) {
+                    $imagePath = $image->store('product_images');
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imagePath,
+                    ]);
+                }
             }
+
+            // Update product categories
+            $product->categories()->sync($request->input('categories'));
+
+            flash()->success('Produk berhasil diperbarui.');
+
+            return redirect()->route('dashboard.product.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal memperbarui produk: ' . $e->getMessage());
+
+            return Redirect::back()->withInput();
         }
-
-        // Update product categories
-        $product->categories()->sync($request->input('categories'));
-
-        return redirect()->route('dashboard.product.index')->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -171,11 +184,19 @@ class ProductController extends Controller
      */
     public function destroy(string $slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $product->images()->delete();
-        $product->categories()->detach();
-        $product->delete();
-        return redirect()->route('dashboard.product.index')->with('success', 'Product deleted successfully.');
+        try {
+            $product = Product::where('slug', $slug)->firstOrFail();
+            $product->images()->delete();
+            $product->categories()->detach();
+            $product->delete();
+            flash()->success('Produk berhasil dihapus.');
+
+            return redirect()->route('dashboard.product.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal menghapus produk: ' . $e->getMessage());
+
+            return Redirect::back();
+        }
     }
 
     /**

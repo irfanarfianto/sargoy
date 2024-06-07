@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FAQ;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class FAQController extends Controller
 {
@@ -20,12 +21,20 @@ class FAQController extends Controller
 
     public function store(Request $request)
     {
-        FAQ::create($request->validate([
-            'pertanyaan' => 'required|min:10|string|unique:faqs',
-            'jawaban' => 'required|min:10|string',
-        ]));
+        try {
+            FAQ::create($request->validate([
+                'pertanyaan' => 'required|min:10|string|unique:faqs',
+                'jawaban' => 'required|min:10|string',
+            ]));
 
-        return redirect()->route('faqs.index')->with('success', 'FAQ created successfully.');
+            flash()->success('FAQ berhasil dibuat.');
+
+            return redirect()->route('faqs.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal membuat FAQ: ' . $e->getMessage());
+
+            return Redirect::back()->withInput();
+        }
     }
 
     public function show(FAQ $faq)
@@ -40,18 +49,34 @@ class FAQController extends Controller
 
     public function update(Request $request, FAQ $faq)
     {
-        $faq->update($request->validate([
-            'pertanyaan' => 'required|min:10|string|unique:faqs',
-            'jawaban' => 'required|min:10|string',
-        ]));
+        try {
+            $faq->update($request->validate([
+                'pertanyaan' => 'required|min:10|string|unique:faqs',
+                'jawaban' => 'required|min:10|string',
+            ]));
 
-        return redirect()->route('faqs.index')->with('success', 'FAQ updated successfully.');
+            flash()->success('FAQ berhasil diperbarui.');
+
+            return redirect()->route('faqs.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal memperbarui FAQ: ' . $e->getMessage());
+
+            return Redirect::back()->withInput();
+        }
     }
 
     public function destroy(FAQ $faq)
     {
-        $faq->delete();
+        try {
+            $faq->delete();
 
-        return redirect()->route('faqs.index')->with('success', 'FAQ deleted successfully.');
+            flash()->success('FAQ berhasil dihapus.');
+
+            return redirect()->route('faqs.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal menghapus FAQ: ' . $e->getMessage());
+
+            return Redirect::back();
+        }
     }
 }

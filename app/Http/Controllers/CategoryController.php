@@ -22,27 +22,35 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'category_name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:categories,slug',
-            'images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'meta_keyword' => 'nullable|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'category_name' => 'required|string|max:255',
+                'slug' => 'nullable|string|max:255|unique:categories,slug',
+                'images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'meta_keyword' => 'nullable|string',
+            ]);
 
-        if (empty($validatedData['slug'])) {
-            $validatedData['slug'] = Str::slug($validatedData['category_name']);
+            if (empty($validatedData['slug'])) {
+                $validatedData['slug'] = Str::slug($validatedData['category_name']);
 
-            // Ensure generated slug is unique
-            $validatedData['slug'] = $this->generateUniqueSlug($validatedData['slug']);
+                // Ensure generated slug is unique
+                $validatedData['slug'] = $this->generateUniqueSlug($validatedData['slug']);
+            }
+
+            if ($request->hasFile('images')) {
+                $validatedData['images'] = $request->file('images')->store('categories', 'public');
+            }
+
+            Category::create($validatedData);
+
+            flash()->success('Kategori berhasil ditambahkan!');
+
+            return redirect()->route('dashboard.categories.index');
+        } catch (\Exception $e) {
+            flash()->error()('Gagal menambahkan kategori: ' . $e->getMessage());
+
+            return redirect()->back()->withInput();
         }
-
-        if ($request->hasFile('images')) {
-            $validatedData['images'] = $request->file('images')->store('categories', 'public');
-        }
-
-        Category::create($validatedData);
-
-        return redirect()->route('dashboard.categories.index')->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     public function edit($id)
@@ -53,29 +61,37 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'category_name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id,
-            'images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'meta_keyword' => 'nullable|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'category_name' => 'required|string|max:255',
+                'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id,
+                'images' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'meta_keyword' => 'nullable|string',
+            ]);
 
-        $category = Category::findOrFail($id);
+            $category = Category::findOrFail($id);
 
-        if (empty($validatedData['slug'])) {
-            $validatedData['slug'] = Str::slug($validatedData['category_name']);
+            if (empty($validatedData['slug'])) {
+                $validatedData['slug'] = Str::slug($validatedData['category_name']);
 
-            // Ensure generated slug is unique
-            $validatedData['slug'] = $this->generateUniqueSlug($validatedData['slug'], $id);
+                // Ensure generated slug is unique
+                $validatedData['slug'] = $this->generateUniqueSlug($validatedData['slug'], $id);
+            }
+
+            if ($request->hasFile('images')) {
+                $validatedData['images'] = $request->file('images')->store('categories', 'public');
+            }
+
+            $category->update($validatedData);
+
+            flash()->success('Kategori berhasil diperbarui!');
+
+            return redirect()->route('dashboard.categories.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal memperbarui kategori: ' . $e->getMessage());
+
+            return redirect()->back()->withInput();
         }
-
-        if ($request->hasFile('images')) {
-            $validatedData['images'] = $request->file('images')->store('categories', 'public');
-        }
-
-        $category->update($validatedData);
-
-        return redirect()->route('dashboard.categories.index')->with('success', 'Kategori berhasil diperbarui!');
     }
 
     // Helper function to generate unique slug
@@ -94,9 +110,17 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
+        try {
+            $category = Category::findOrFail($id);
+            $category->delete();
 
-        return redirect()->route('dashboard.categories.index')->with('success', 'Kategori berhasil dihapus!');
+            flash()->success('Kategori berhasil dihapus!');
+
+            return redirect()->route('dashboard.categories.index');
+        } catch (\Exception $e) {
+            flash()->error('Gagal menghapus kategori: ' . $e->getMessage());
+
+            return redirect()->back();
+        }
     }
 }

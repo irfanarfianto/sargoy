@@ -6,6 +6,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class OauthController extends Controller
 {
@@ -13,17 +14,18 @@ class OauthController extends Controller
     {
         return Socialite::driver('google')->redirect();
     }
+
     public function handleProviderCallback()
     {
         try {
-
             $user = Socialite::driver('google')->user();
 
             $finduser = User::where('gauth_id', $user->id)->first();
 
             if ($finduser) {
-
                 Auth::login($finduser);
+
+                flash()->success('Login berhasil.');
 
                 return redirect(url('/'));
             } else {
@@ -39,10 +41,14 @@ class OauthController extends Controller
 
                 Auth::login($newUser);
 
+                flash()->success('Akun baru berhasil dibuat.');
+
                 return redirect(url('/'));
             }
         } catch (Exception $e) {
-            dd($e->getMessage());
+            flash()->error('Gagal melakukan autentikasi: ' . $e->getMessage());
+
+            return Redirect::back();
         }
     }
 }
