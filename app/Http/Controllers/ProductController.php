@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Support\Str;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use NumberFormatter;
 use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
@@ -18,11 +19,16 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::paginate(10);
-        $products->getCollection()->transform(function ($product) {
-            $product->price = number_format($product->price, 0, ',', '.');
-            return $product;
-        });
+
+        $products = Product::with('images')->paginate(9);
+        $categories = Category::all();
+
+        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+
+        foreach ($products as $product) {
+            $product->price = $formatter->formatCurrency($product->price, 'IDR');
+        }
 
         return view('dashboard.product.index', compact('products'));
     }
@@ -32,21 +38,24 @@ class ProductController extends Controller
      */
     public function publicIndex()
     {
-        $products = Product::paginate(9);
-        $products->getCollection()->transform(function ($product) {
-            $product->price = number_format($product->price, 0, ',', '.');
-            return $product;
-        });
-
+        $products = Product::with('images')->paginate(9);
         $categories = Category::all();
 
-        return view('product.index', compact('products', 'categories'));
+        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+
+        foreach ($products as $product) {
+            $product->price = $formatter->formatCurrency($product->price, 'IDR');
+        }
+
+        return view('product.index', ['products' => $products, 'categories' => $categories]);
     }
 
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        $product->price = number_format($product->price, 0, ',', '.');
+        $product = Product::with('images', 'categories')->where('slug', $slug)->firstOrFail();
+        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
+        $product->price = $formatter->formatCurrency($product->price, 'IDR');
 
         $breadcrumbItems = [
             ['name' => 'Beranda', 'url' => '/'],

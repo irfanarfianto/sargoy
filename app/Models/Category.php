@@ -12,7 +12,6 @@ class Category extends Model
     protected $fillable = [
         'category_name',
         'images',
-        'position',
         'meta_keyword',
     ];
 
@@ -27,6 +26,8 @@ class Category extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_category');
+        return $this->belongsToMany(Product::class, 'product_category')
+        ->using(ProductCategory::class)
+            ->withTimestamps();
     }
 }

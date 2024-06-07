@@ -32,7 +32,9 @@ class Product extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'product_category');
+        return $this->belongsToMany(Category::class, 'product_category')
+        ->using(ProductCategory::class)
+            ->withTimestamps();
     }
 
     public function reviews()
