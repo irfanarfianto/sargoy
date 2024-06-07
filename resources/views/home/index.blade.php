@@ -8,7 +8,7 @@
             @foreach ($categories as $category)
                 <swiper-slide>
                     <div class="flex flex-col items-center justify-center">
-                        <img src="{{ $category->images }}" alt="{{ $category->name }}"
+                        <img src="{{ asset('storage/' . $category->images) }}" alt="{{ $category->name }}"
                             class="w-24 h-24 object-cover rounded-full mb-4">
                         <h2 class="text-center text-lg font-bold text-gray-800">{{ $category->category_name }}</h2>
                     </div>
