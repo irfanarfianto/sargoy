@@ -12,7 +12,6 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\ReviewController;
-use App\Models\Review;
 
 // ROLE PUBLIC
 Route::get('/', HomeController::class)->name('home');
