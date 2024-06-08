@@ -1,7 +1,7 @@
 <div class="flex w-full overflow-hidden items-start">
     <div class="overflow-hidden relative">
         <a href="{{ $link }}">
-            <img class="rounded-lg h-48  object-cover transform transition-transform duration-500 ease-in-out hover:scale-110"
+            <img class="rounded-lg h-48 w-48  object-cover transform transition-transform duration-500 ease-in-out hover:scale-110"
                 src="{{ $image }}" alt="{{ $title }}" />
         </a>
     </div>
