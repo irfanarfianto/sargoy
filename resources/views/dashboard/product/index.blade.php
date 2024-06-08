@@ -95,7 +95,8 @@
                     <td class="p-3 whitespace-nowrap">
                         <div class="flex items-start space-x-2">
                             @foreach ($product->images->take(1) as $image)
-                                <img class="w-14 h-14 rounded-sm" src="{{ asset($product->image_path) }}"
+                                <img class="w-14 h-14 rounded-sm"
+                                    src="{{ asset($product->images->first()->image_path) }}"
                                     alt="{{ $product->product_name }}">
                             @endforeach
                             <div class="text-sm text-gray-900">{{ $product->price }}

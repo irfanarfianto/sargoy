@@ -90,8 +90,23 @@ class ProductController extends Controller
                 'categories.*' => 'exists:categories,id',
             ]);
 
+            // Cek jumlah gambar
+            if ($request->hasFile('images') && count($request->file('images')) > 4) {
+                return Redirect::back()->withErrors(['images' => 'Anda hanya bisa mengunggah maksimal 4 gambar.'])->withInput();
+            }
+
             $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
             $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
+
+            // Ensure slug is unique
+            $existingSlugs = Product::where('slug', 'like', $slug . '%')->pluck('slug');
+            if ($existingSlugs->contains($slug)) {
+                $count = 2;
+                while ($existingSlugs->contains($slug . '-' . $count)) {
+                    $count++;
+                }
+                $slug = $slug . '-' . $count;
+            }
 
             // Create product with unique slug
             $product = Product::create([
@@ -125,6 +140,9 @@ class ProductController extends Controller
         }
     }
 
+
+
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -132,7 +150,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $product = Product::where('slug', $slug)->firstOrFail();
-        return view('product.edit', compact('product', 'categories'));
+        return view('dashboard.product.create', compact('product', 'categories'));
     }
 
     /**
