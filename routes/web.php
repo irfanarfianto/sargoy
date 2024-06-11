@@ -12,6 +12,7 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UserController;
 
 // ROLE PUBLIC
 Route::get('/', HomeController::class)->name('home');
@@ -58,6 +59,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('dashboard/admin/edit', [AdminController::class, 'edit'])->name('admin.edit');
     Route::patch('dashboard/admin/edit', [AdminController::class, 'update'])->name('admin.update');
     Route::delete('dashboard/admin/edit', [AdminController::class, 'destroy'])->name('admin.destroy');
+
+    // USER MANAJEMEN
+    Route::get('/dashboard/users', [UserController::class, 'index'])->name('dashboard.users.index');
+    Route::get('/dashboard/users/create', [UserController::class, 'create'])->name('dashboard.users.create');
+    Route::post('/dashboard/users', [UserController::class, 'store'])->name('dashboard.users.store');
+    Route::get('/dashboard/users/{id}/edit', [UserController::class, 'edit'])->name('dashboard.users.edit');
+    Route::put('/dashboard/users/{id}', [UserController::class, 'update'])->name('dashboard.users.update');
+    Route::delete('/dashboard/users/{id}', [UserController::class, 'destroy'])->name('dashboard.users.destroy');
 
     // FAQ
     Route::resource('dashboard/faqs', FAQController::class);

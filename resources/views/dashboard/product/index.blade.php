@@ -1,5 +1,6 @@
 <x-dashboard-layout>
     <div class="items-center mt-14">
+        <x-breadcrumb.breadcrumb :items="$breadcrumbItems" />
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Produk') }}

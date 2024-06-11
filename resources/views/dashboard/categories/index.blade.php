@@ -1,5 +1,8 @@
 <x-dashboard-layout>
-    <h2 class="font-semibold mt-14 text-xl text-gray-800 leading-tight">
+    <div class="mt-14">
+        <x-breadcrumb.breadcrumb :items="$breadcrumbItems" />
+    </div>
+    <h2 class="font-semibold mt-4 text-xl text-gray-800 leading-tight">
         {{ __('Kategori Produk') }}
     </h2>
     <div class="container mt-5 flex gap-2.5 flex-wrap-reverse mx-auto max-w-screen">
