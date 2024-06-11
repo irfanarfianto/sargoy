@@ -3,7 +3,6 @@
 <input {{ $disabled ? 'disabled' : '' }} {!! $attributes->merge([
     'class' => 'w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm',
 ]) !!}>
-
 <style>
     /* Hide increment and decrement buttons */
     input[type=number]::-webkit-outer-spin-button,
@@ -14,5 +13,11 @@
 
     input[type=number] {
         -moz-appearance: textfield;
+    }
+
+    /* Style for disabled input */
+    input[disabled] {
+        color: #999;
+        /* Change to the desired light gray color */
     }
 </style>

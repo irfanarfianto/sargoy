@@ -33,7 +33,7 @@
                             <x-button.secondary>
                                 Batal
                             </x-button.secondary>
-                            <x-button.danger>
+                            <x-button.danger type="submit">
                                 Hapus
                             </x-button.danger>
                         </div>

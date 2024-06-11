@@ -61,14 +61,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::delete('dashboard/admin/edit', [AdminController::class, 'destroy'])->name('admin.destroy');
 
     // USER MANAJEMEN
-    // Route::resource('dashboard/users', \App\Http\Controllers\UserController::class);
     Route::get('/dashboard/users', [UserController::class, 'index'])->name('dashboard.users.index');
     Route::get('/dashboard/users/create', [UserController::class, 'create'])->name('dashboard.users.create');
     Route::post('/dashboard/users', [UserController::class, 'store'])->name('dashboard.users.store');
-    Route::get('/dashboard/users/{user}/edit', [UserController::class, 'edit'])->name('dashboard.users.edit');
-    Route::put('/dashboard/users/{user}', [UserController::class, 'update'])->name('dashboard.users.update');
-    Route::delete('/dashboard/users/{user}', [UserController::class, 'destroy'])->name('dashboard.users.destroy');
-
+    Route::get('/dashboard/users/{id}/edit', [UserController::class, 'edit'])->name('dashboard.users.edit');
+    Route::put('/dashboard/users/{id}', [UserController::class, 'update'])->name('dashboard.users.update');
+    Route::delete('/dashboard/users/{id}', [UserController::class, 'destroy'])->name('dashboard.users.destroy');
 
     // FAQ
     Route::resource('dashboard/faqs', FAQController::class);

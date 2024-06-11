@@ -12,12 +12,41 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('roles')->paginate(10);
+        $sort = $request->get('sort', 'name');
+        $direction = $request->get('direction', 'asc');
+        $search = $request->get('search');
+
+        $query = User::query();
+
+        // Filter data based on search query
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhereHas('roles', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+        
+        $query->orderBy($sort, $direction);
+        // Fetch the users with roles
+        $users = $query->with('roles')->paginate(10);
         $roles = Role::all();
-        return view('dashboard.users.index', compact('users', 'roles'));
+
+        // Define the breadcrumb items
+        $breadcrumbs = [
+            ['name' => 'Dashboard', 'url' => route('admin.dashboard')],
+            ['name' => 'User Management']
+        ];
+
+        // Pass users, roles, and breadcrumbs to the view
+        return view('dashboard.users.index', compact('users', 'roles', 'breadcrumbs', 'search'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -64,7 +93,8 @@ class UserController extends Controller
         // Validate the request
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'roles' => 'required|array', // Ensure roles are provided as an array
         ]);
 
         // Start a database transaction
@@ -77,25 +107,8 @@ class UserController extends Controller
                 'email' => $request->email,
             ]);
 
-            // Check if roles were provided in the request
-            if ($request->has('roles')) {
-                // Get the roles assigned to the user
-                $assignedRoles = $user->roles->pluck('id')->toArray();
-
-                // Compare the assigned roles with the roles from the request
-                $newRoles = array_diff($request->roles, $assignedRoles);
-                $removedRoles = array_diff($assignedRoles, $request->roles);
-
-                // Detach roles that were removed
-                foreach ($removedRoles as $role) {
-                    $user->removeRole($role);
-                }
-
-                // Attach new roles
-                foreach ($newRoles as $role) {
-                    $user->assignRole($role);
-                }
-            }
+            // Sync the user's roles
+            $user->syncRoles($request->roles);
 
             // Commit the transaction
             DB::commit();
@@ -113,31 +126,24 @@ class UserController extends Controller
         }
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        // Temukan pengguna berdasarkan ID
-        $user = User::findOrFail($id);
-
-        // Mulai transaksi database
-        DB::beginTransaction();
-
         try {
+            // Temukan pengguna berdasarkan ID
+            $user = User::findOrFail($id);
+
             // Hapus pengguna
             $user->delete();
-
-            // Commit transaksi database
-            DB::commit();
 
             // Redirect kembali dengan pesan sukses
             flash()->success('User deleted successfully.');
             return redirect()->route('dashboard.users.index');
         } catch (\Exception $e) {
-            // Rollback transaksi database jika terjadi kesalahan
-            DB::rollback();
+            // Log the error for debugging
+            logger()->error('Failed to delete user. Error message: ' . $e->getMessage());
 
             // Redirect kembali dengan pesan kesalahan
             flash()->error('Failed to delete user. Error message: ' . $e->getMessage());

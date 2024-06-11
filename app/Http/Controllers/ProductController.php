@@ -25,11 +25,17 @@ class ProductController extends Controller
         $products = Product::with('images')->paginate(9);
         $categories = Category::all();
 
+        $breadcrumbItems = [
+            ['name' => 'Dashboard', 'url' => auth()->user()->hasRole('seller') ? route('seller.dashboard') : route('admin.dashboard')],
+            ['name' => 'Katalog', 'url' => route('dashboard.product.index')],
+            ['name' => 'Produk'],
+        ];
+
         foreach ($products as $product) {
             $product->price = NumberHelper::getCurrencyFormatter()->formatCurrency($product->price, 'IDR');
         }
 
-        return view('dashboard.product.index', compact('products'));
+        return view('dashboard.product.index', compact('products', 'breadcrumbItems'));
     }
 
     /**

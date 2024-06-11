@@ -28,26 +28,30 @@
                         @method('PUT')
                         <!-- Input fields -->
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
-                            <input type="text" id="name" name="name" value="{{ $user->name }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <x-label.input for="name"
+                                class="block text-sm font-medium text-gray-700">Name:</x-label.input>
+                            <x-input.text type="text" id="name" name="name" value="{{ $user->name }}"
+                                disabled />
                         </div>
                         <div class="mt-4">
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
-                            <input type="email" id="email" name="email" value="{{ $user->email }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <x-label.input for="email"
+                                class="block text-sm font-medium text-gray-700">Email:</x-label.input>
+                            <x-input.text type="email" id="email" name="email" value="{{ $user->email }}"
+                                disabled />
                         </div>
                         <div class="mt-4">
-                            <label for="roles" class="...">Roles:</label>
+                            <x-label.input for="roles" class="...">Roles:</x-label.input>
+                            <!-- Roles dropdown -->
                             <select id="roles" name="roles[]"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}"
+                                    <option value="{{ $role->name }}"
                                         {{ $user->hasRole($role->name) ? 'selected' : '' }}>
                                         {{ $role->name }}
                                     </option>
                                 @endforeach
                             </select>
+
                         </div>
                         <!-- Submit button -->
                         <div class="mt-4">

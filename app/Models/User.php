@@ -2,28 +2,29 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Review;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
     /**
-     * Determine if the user is active.
+     * The "booted" method of the model.
      *
-     * @return bool
+     * @return void
      */
-    public function isActive()
+    protected static function booted()
     {
-        // Tentukan kondisi untuk menentukan apakah pengguna dianggap aktif
-        // Misalnya, jika aktivitas terakhirnya dalam 5 menit terakhir, maka dia dianggap aktif
-        return $this->last_activity >= now()->subMinutes(5);
+        parent::boot();
+
+        // Generate a UUID when creating a new model instance
+        static::creating(function ($model) {
+            $model->id = (string) Str::uuid();
+        });
     }
 
     /**
@@ -34,7 +35,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password', 'status',
+        'password',
+        'status',
         'gauth_id',
         'gauth_type',
     ];
@@ -54,13 +56,36 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Determine if the user is active.
+     *
+     * @return bool
+     */
+    public function isActive()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        // Tentukan kondisi untuk menentukan apakah pengguna dianggap aktif
+        // Misalnya, jika aktivitas terakhirnya dalam 5 menit terakhir, maka dia dianggap aktif
+        return $this->last_activity >= now()->subMinutes(5);
     }
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The data type of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
     public function reviews()
     {
