@@ -23,15 +23,11 @@ class CategoryFactory extends Factory
      */
     public function definition()
     {
-        // Buat instance Faker dengan lokal Indonesia
-        $faker = FakerFactory::create('id_ID');
-        $categoryName = $this->faker->word;
-
         return [
-            'category_name' => $faker->word(),
-            'slug' => Str::slug($categoryName),
-            'meta_keyword' => $faker->words(3, true),
-            'images' => $faker->imageUrl(),
+            'category_name' => $this->faker->word,
+            'slug' => $this->faker->unique()->slug,
+            'meta_keyword' => $this->faker->words(3, true),
+            'images' => $this->faker->imageUrl(640, 480),
             'created_at' => now(),
             'updated_at' => now(),
         ];

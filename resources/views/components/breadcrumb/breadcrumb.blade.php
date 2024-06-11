@@ -1,4 +1,3 @@
-<!-- resources/views/components/breadcrumb.blade.php -->
 @props(['items'])
 
 <nav class="flex" aria-label="Breadcrumb">
@@ -15,7 +14,7 @@
                     @endif
                     @if (isset($item['url']))
                         <a href="{{ $item['url'] }}"
-                            class="text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">{{ $item['name'] }}</a>
+                            class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">{{ $item['name'] }}</a>
                     @else
                         <span
                             class="text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">{{ $item['name'] }}</span>

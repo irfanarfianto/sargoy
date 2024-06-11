@@ -11,7 +11,12 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::orderBy('created_at', 'desc')->get();
-        return view('dashboard.categories.index', compact('categories'));
+        $breadcrumbItems = [
+            ['name' => 'Dashboard', 'url' => route('admin.dashboard')],
+            ['name' => 'Katalog', 'url' => route('dashboard.product.index')],
+            ['name' => 'Kategori'],
+        ];
+        return view('dashboard.categories.index', compact('categories', 'breadcrumbItems'));
     }
 
 

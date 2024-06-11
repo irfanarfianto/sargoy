@@ -1,5 +1,6 @@
 <x-dashboard-layout>
     <div class="items-center mt-14">
+        <x-breadcrumb.breadcrumb :items="$breadcrumbItems" />
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Produk') }}
@@ -95,7 +96,8 @@
                     <td class="p-3 whitespace-nowrap">
                         <div class="flex items-start space-x-2">
                             @foreach ($product->images->take(1) as $image)
-                                <img class="w-14 h-14 rounded-sm" src="{{ asset($product->image_path) }}"
+                                <img class="w-14 h-14 rounded-sm"
+                                    src="{{ asset($product->images->first()->image_path) }}"
                                     alt="{{ $product->product_name }}">
                             @endforeach
                             <div class="text-sm text-gray-900">{{ $product->price }}

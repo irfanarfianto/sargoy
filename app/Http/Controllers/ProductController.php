@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NumberHelper;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Str;
@@ -11,6 +12,7 @@ use NumberFormatter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -23,14 +25,17 @@ class ProductController extends Controller
         $products = Product::with('images')->paginate(9);
         $categories = Category::all();
 
-        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
-        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+        $breadcrumbItems = [
+            ['name' => 'Dashboard', 'url' => auth()->user()->hasRole('seller') ? route('seller.dashboard') : route('admin.dashboard')],
+            ['name' => 'Katalog', 'url' => route('dashboard.product.index')],
+            ['name' => 'Produk'],
+        ];
 
         foreach ($products as $product) {
-            $product->price = $formatter->formatCurrency($product->price, 'IDR');
+            $product->price = NumberHelper::getCurrencyFormatter()->formatCurrency($product->price, 'IDR');
         }
 
-        return view('dashboard.product.index', compact('products'));
+        return view('dashboard.product.index', compact('products', 'breadcrumbItems'));
     }
 
     /**
@@ -41,11 +46,8 @@ class ProductController extends Controller
         $products = Product::with('images')->paginate(9);
         $categories = Category::all();
 
-        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
-        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
-
         foreach ($products as $product) {
-            $product->price = $formatter->formatCurrency($product->price, 'IDR');
+            $product->price = NumberHelper::getCurrencyFormatter()->formatCurrency($product->price, 'IDR');
         }
 
         return view('product.index', ['products' => $products, 'categories' => $categories]);
@@ -54,8 +56,7 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::with('images', 'categories')->where('slug', $slug)->firstOrFail();
-        $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
-        $product->price = $formatter->formatCurrency($product->price, 'IDR');
+        $product->price = NumberHelper::getCurrencyFormatter()->formatCurrency($product->price, 'IDR');
 
         $breadcrumbItems = [
             ['name' => 'Beranda', 'url' => '/'],
@@ -78,6 +79,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
         try {
@@ -90,14 +92,33 @@ class ProductController extends Controller
                 'categories.*' => 'exists:categories,id',
             ]);
 
-            $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+            // Cek jumlah gambar
+            if ($request->hasFile('images') && count($request->file('images')) > 4) {
+                return Redirect::back()->withErrors(['images' => 'Anda hanya bisa mengunggah maksimal 4 gambar.'])->withInput();
+            }
+
+            // Format harga menggunakan NumberFormatter
+            $formatter = new NumberFormatter('id_ID', NumberFormatter::CURRENCY);
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+            $price = $formatter->formatCurrency($validatedData['price'], 'IDR');
+
             $slug = Str::slug($request->product_name . '-' . now()->format('d-m-Y-H-i-s'), '-');
+
+            // Ensure slug is unique
+            $existingSlugs = Product::where('slug', 'like', $slug . '%')->pluck('slug');
+            if ($existingSlugs->contains($slug)) {
+                $count = 2;
+                while ($existingSlugs->contains($slug . '-' . $count)) {
+                    $count++;
+                }
+                $slug = $slug . '-' . $count;
+            }
 
             // Create product with unique slug
             $product = Product::create([
                 'product_name' => $request->input('product_name'),
                 'description' => $request->input('description'),
-                'price' => $validatedData['price'],
+                'price' => $price,
                 'slug' => $slug,
             ]);
 
@@ -125,6 +146,8 @@ class ProductController extends Controller
         }
     }
 
+
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -132,7 +155,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $product = Product::where('slug', $slug)->firstOrFail();
-        return view('product.edit', compact('product', 'categories'));
+        return view('dashboard.product.edit', compact('product', 'categories'));
     }
 
     /**
@@ -141,8 +164,11 @@ class ProductController extends Controller
     public function update(Request $request, $slug)
     {
         try {
+            $product = Product::where('slug', $slug)->firstOrFail();
+
             $validatedData = $request->validate([
                 'product_name' => 'required|string|max:255',
+                'slug' => 'nullable|string|max:255|unique:products,slug,' . $product->id,
                 'description' => 'nullable|string',
                 'price' => 'required|numeric',
                 'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -150,13 +176,21 @@ class ProductController extends Controller
                 'categories.*' => 'exists:categories,id',
             ]);
 
-            $product = Product::where('slug', $slug)->firstOrFail();
-            $validatedData['price'] = str_replace(['.', ','], '', $validatedData['price']);
+            // Update product with validated data
             $product->update($validatedData);
+
+            // Ensure price is stored correctly
+            $product->price = str_replace(['.', ','], '', $product->price);
 
             // Update product images if present
             if ($request->hasFile('images')) {
-                $product->images()->delete();
+                // Delete existing images from server
+                foreach ($product->images as $image) {
+                    Storage::delete($image->image_path);
+                    $image->delete();
+                }
+
+                // Add new images
                 foreach ($request->file('images') as $image) {
                     $imagePath = $image->store('product_images');
                     ProductImage::create([
@@ -178,6 +212,7 @@ class ProductController extends Controller
             return Redirect::back()->withInput();
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
