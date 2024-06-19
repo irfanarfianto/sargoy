@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="flex flex-col mx-auto max-w-screen-xl p-4">
         <div class="flex justify-center">
-            <x-breadcrumb.breadcrumb :items="$breadcrumbs" />
+            <x-breadcrumb.breadcrumb :items="$breadcrumbItems" />
         </div>
         <div class="flex flex-row md:flex-wrap items-start justify-center mt-4">
             <div class="flex flex-col max-w-1/3">
